@@ -1416,6 +1416,274 @@ body.is-shake .wrap { animation: shake .4s; }
 .modal .eyebrow { color: #ff6b7a; }
 .modal-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; margin-top: 20px; }
 
+/* ───────────────────────── tab settings (gear) ───────────────────────── */
+.modal--tabs { border-color: rgba(255, 255, 255, .2); }
+.modal--tabs .eyebrow { color: var(--smog); }
+.tab-toggles { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 4px; }
+.tab-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, .03);
+  cursor: pointer;
+  font: 800 22px/1 var(--font-display);
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+.tab-toggle { position: relative; }
+.tab-toggle input { position: absolute; opacity: 0; pointer-events: none; }
+.switch {
+  flex: none;
+  position: relative;
+  width: 46px;
+  height: 26px;
+  background: rgba(255, 255, 255, .12);
+  transition: background .2s;
+}
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  background: var(--smog);
+  transition: transform .2s var(--snap), background .2s;
+}
+.tab-toggle input:checked + .switch { background: var(--palm); }
+.tab-toggle input:checked + .switch::after { transform: translateX(20px); background: var(--shade); }
+.tab-toggle input:focus-visible + .switch { outline: 2px solid var(--gold); outline-offset: 2px; }
+.tab-toggle input:disabled + .switch { opacity: .5; }
+.tab-toggle:has(input:not(:checked)) > span:first-child { color: var(--dim); }
+
+/* ───────────────────────── notes, planner and raccoon tabs ───────────────────────── */
+#tab-notes[aria-selected="true"]::after { background: var(--gold); }
+#tab-planner[aria-selected="true"]::after { background: var(--flare); }
+#tab-raccoon[aria-selected="true"]::after { background: var(--siren-b); }
+.tab-panel { padding: 12px 16px 16px; }
+
+/* notes: a quick-jot box, then every note as an editable card, newest first */
+.note-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px;
+  background: var(--asphalt-hi);
+  border: 1px solid var(--line);
+  transition: border-color .2s, box-shadow .2s;
+}
+.note-form:focus-within { border-color: rgba(255, 209, 102, .7); box-shadow: 0 0 0 4px rgba(255, 209, 102, .12); }
+.note-form textarea, .note textarea {
+  display: block;
+  width: 100%;
+  resize: none;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  padding: 8px 10px;
+  font: 500 16px/1.45 var(--font-body);
+  overflow: hidden;
+}
+.note-form textarea::placeholder { color: var(--dim); }
+.note-form-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-left: 10px; }
+.note-hint { font: 600 12px/1.2 var(--font-hud); letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+.add-btn--gold { background: var(--gold); }
+.notes { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.note {
+  background: var(--asphalt-hi);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--gold);
+}
+.note:focus-within { border-color: rgba(255, 209, 102, .55); border-left-color: var(--gold); }
+.note-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 10px 6px; }
+.note-foot time { font: 600 12px/1 var(--font-hud); letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+.note-del { display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; background: none; color: var(--dim); cursor: pointer; }
+.note-del svg { width: 16px; height: 16px; }
+.empty--notes > svg { color: var(--gold); }
+.empty--notes { margin: 12px 0 0; }
+
+/* day planner: one line per hour, the current hour lit up */
+.planner-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.planner-day { flex: 1; min-width: 0; text-align: center; }
+.planner-day .eyebrow { margin: 0 0 4px; color: var(--flare); }
+.planner-day h3 { margin: 0; font: 900 26px/1 var(--font-display); text-transform: uppercase; }
+.planner-nav {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, .04);
+  color: var(--smog);
+  cursor: pointer;
+}
+.planner-nav svg { width: 20px; height: 20px; }
+.planner-tools { display: flex; justify-content: space-between; gap: 12px; margin-top: 10px; }
+.planner { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+.slot-row {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr);
+  align-items: center;
+  background: rgba(255, 255, 255, .025);
+  border-left: 3px solid transparent;
+}
+.slot-row label {
+  padding: 0 0 0 10px;
+  font: 700 15px/1 var(--font-hud);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--dim);
+  font-variant-numeric: tabular-nums;
+}
+.slot-row input {
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  padding: 11px 10px;
+  font: 600 16px/1.2 var(--font-body);
+}
+.slot-row:focus-within { background: var(--asphalt-hi); border-left-color: var(--smog); }
+.slot-row.is-filled label { color: var(--smog); }
+.slot-row.is-past { opacity: .55; }
+.slot-row.is-now { border-left-color: var(--flare); background: rgba(255, 155, 61, .09); opacity: 1; }
+.slot-row.is-now label { color: var(--flare); }
+
+/* raccoon mode: big quick-start timers that fill the board */
+.coon-intro { margin: 0 0 12px; color: var(--smog); }
+.coon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.coon-tile {
+  position: relative;
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 4px;
+  padding: 16px;
+  border: 1px solid rgba(61, 123, 255, .45);
+  background: linear-gradient(160deg, rgba(61, 123, 255, .16), rgba(61, 123, 255, .03));
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%);
+  transition: transform .12s, background .2s;
+}
+.coon-tile:active { transform: scale(.98); }
+.coon-tile b { font: 900 clamp(56px, 13vw, 92px)/.85 var(--font-display); letter-spacing: -.01em; }
+.coon-tile small { font: 700 14px/1 var(--font-hud); letter-spacing: .14em; text-transform: uppercase; color: #9bb8ff; }
+.coon-tile > svg { position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; color: rgba(155, 184, 255, .55); }
+.coon-tile--custom { cursor: default; border-color: rgba(46, 230, 200, .45); background: linear-gradient(160deg, rgba(46, 230, 200, .13), rgba(46, 230, 200, .02)); }
+.coon-tile--custom small { color: var(--palm); }
+.coon-tile--custom > svg { display: none; }
+.coon-custom { display: flex; align-items: flex-end; gap: 8px; width: 100%; }
+.coon-custom input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  border-bottom: 2px solid rgba(46, 230, 200, .5);
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  font: 900 clamp(48px, 11vw, 80px)/.85 var(--font-display);
+  padding: 0;
+  -moz-appearance: textfield;
+}
+.coon-custom input::-webkit-outer-spin-button, .coon-custom input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.coon-custom input:focus { border-bottom-color: var(--palm); }
+.coon-go {
+  flex: none;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  background: var(--palm);
+  color: var(--shade);
+  font: 800 16px/1 var(--font-hud);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+/* the running timer takes over the whole app */
+.coon {
+  position: fixed;
+  inset: 0;
+  z-index: 48;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(20px + env(safe-area-inset-top, 0px)) 20px calc(20px + env(safe-area-inset-bottom, 0px));
+  background: #070912;
+  overflow: hidden;
+  text-align: center;
+}
+.coon-open body { overflow: hidden; }
+.coon-fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0;
+  background: linear-gradient(0deg, rgba(61, 123, 255, .5), rgba(46, 230, 200, .22));
+  transition: height .25s linear;
+}
+.coon-fill::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 3px;
+  background: var(--palm);
+  box-shadow: 0 0 24px var(--palm);
+}
+.coon-inner { position: relative; display: flex; flex-direction: column; align-items: center; gap: 14px; max-width: 100%; }
+.coon-face { width: 76px; height: 76px; color: #9bb8ff; }
+.coon-kicker { margin: 0; font: 700 15px/1 var(--font-hud); letter-spacing: .2em; text-transform: uppercase; color: #9bb8ff; }
+.coon-time {
+  font: 900 clamp(110px, 32vw, 300px)/.8 var(--font-display);
+  letter-spacing: -.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  text-shadow: 0 6px 0 var(--shade);
+}
+.coon-sub { margin: 0; max-width: 34ch; font: 600 17px/1.35 var(--font-body); color: var(--smog); }
+.coon-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 6px; }
+.coon-actions .btn { min-height: 48px; background: rgba(7, 9, 18, .6); }
+.coon.is-paused .coon-time { opacity: .55; }
+.coon.is-done { background: #1a1405; }
+.coon.is-done .coon-fill { height: 100% !important; background: linear-gradient(0deg, rgba(255, 209, 102, .45), rgba(255, 155, 61, .2)); }
+.coon.is-done .coon-fill::before { display: none; }
+.coon.is-done .coon-time { color: var(--gold); animation: coonBlink .8s steps(2, jump-none) infinite; }
+.coon.is-done .coon-kicker, .coon.is-done .coon-face { color: var(--gold); }
+.coon.is-done .coon-sub { color: var(--ink); }
+@keyframes coonBlink { 50% { opacity: .35; } }
+.coon-chip {
+  position: fixed;
+  right: 16px;
+  bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  z-index: 46;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px 8px 10px;
+  border: 1px solid rgba(61, 123, 255, .6);
+  background: rgba(13, 16, 34, .96);
+  color: var(--ink);
+  font: 900 26px/1 var(--font-display);
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 14px 40px -10px rgba(0, 0, 0, .8);
+  cursor: pointer;
+}
+.coon-chip svg { width: 26px; height: 26px; color: #9bb8ff; }
+.coon-chip.is-done { border-color: var(--gold); color: var(--gold); }
+
 /* ───────────────────────── wider screens ───────────────────────── */
 @media (min-width: 720px) {
   .wrap { padding-top: 22px; gap: 20px; }
@@ -1496,11 +1764,20 @@ body.is-shake .wrap { animation: shake .4s; }
   .pay { font-size: 22px; }
   .add-btn { padding: 0 14px 0 12px; }
 }
-/* four tabs have to fit on a phone: Today, Tomorrow, Jail, Calendar */
+/* up to seven tabs on a phone: keep them compact; the row scrolls sideways if needed */
 @media (max-width: 430px) {
   .tabs { gap: 9px; }
   .tab { gap: 4px; font-size: 17px; }
   .count { min-width: 17px; padding: 2px 4px; font-size: 11px; }
+  .stash { gap: 6px; }
+  .icon-btn { width: 34px; height: 34px; }
+  .icon-btn svg { width: 18px; height: 18px; }
+  .tab-panel { padding: 10px 12px 12px; }
+  .coon-tile { min-height: 124px; padding: 12px; }
+}
+@media (min-width: 720px) {
+  .tab-panel { padding: 14px 20px 22px; }
+  .coon-tile { min-height: 190px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1536,6 +1813,9 @@ body.is-shake .wrap { animation: shake .4s; }
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></svg>
       </button>
       <button class="icon-btn" id="mute-btn" type="button" aria-pressed="false" aria-label="Mute sound"></button>
+      <button class="icon-btn" id="tabs-btn" type="button" aria-haspopup="dialog" aria-label="Choose which tabs to show" title="Tabs">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      </button>
     </div>
   </div>
 </header>
@@ -1644,6 +1924,9 @@ body.is-shake .wrap { animation: shake .4s; }
           <button class="tab" id="tab-tomorrow" role="tab" type="button" aria-selected="false" aria-controls="tomorrow-list" tabindex="-1">Tomorrow <span class="count" id="count-tomorrow">0</span></button>
           <button class="tab" id="tab-jail" role="tab" type="button" aria-selected="false" aria-controls="jail-list" tabindex="-1">Jail <span class="count" id="count-jail">0</span></button>
           <button class="tab" id="tab-calendar" role="tab" type="button" aria-selected="false" aria-controls="calendar-panel" tabindex="-1">Calendar</button>
+          <button class="tab" id="tab-notes" role="tab" type="button" aria-selected="false" aria-controls="notes-panel" tabindex="-1">Notes</button>
+          <button class="tab" id="tab-planner" role="tab" type="button" aria-selected="false" aria-controls="planner-panel" tabindex="-1">Planner</button>
+          <button class="tab" id="tab-raccoon" role="tab" type="button" aria-selected="false" aria-controls="raccoon-panel" tabindex="-1">Raccoon</button>
         </div>
       </div>
 
@@ -1697,6 +1980,68 @@ body.is-shake .wrap { animation: shake .4s; }
            first time you open the tab, and keeps its own data, so it can't disturb the board. -->
       <div class="calendar-panel" id="calendar-panel" role="tabpanel" aria-labelledby="tab-calendar" hidden>
         <iframe id="calendar-frame" title="Calendar" loading="lazy"></iframe>
+      </div>
+
+      <!-- Notes: saved on this device as you type. -->
+      <div class="tab-panel notes-panel" id="notes-panel" role="tabpanel" aria-labelledby="tab-notes" hidden>
+        <form class="note-form" id="note-form" autocomplete="off">
+          <label class="sr-only" for="note-input">New note</label>
+          <textarea id="note-input" rows="2" maxlength="5000" placeholder="Jot it down before it's gone"></textarea>
+          <div class="note-form-row">
+            <span class="note-hint" id="note-hint">Saved on this device</span>
+            <button type="submit" class="add-btn add-btn--gold">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+              Note
+            </button>
+          </div>
+        </form>
+        <ul class="notes" id="notes-list" aria-label="Notes"></ul>
+        <div class="empty empty--notes" id="notes-empty" hidden>
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M12 6h18l8 8v28H12z"/><path d="M30 6v8h8M18 24h14M18 31h14M18 38h8"/></svg>
+          <div>
+            <h3>No notes yet</h3>
+            <p>Phone numbers, ideas, the thing you'll forget in five minutes. Edit any note by tapping it.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day planner: an hour-by-hour plan for any day, saved on this device. -->
+      <div class="tab-panel planner-panel" id="planner-panel" role="tabpanel" aria-labelledby="tab-planner" hidden>
+        <div class="planner-head">
+          <button class="planner-nav" id="planner-prev" type="button" aria-label="Previous day">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+          </button>
+          <div class="planner-day" aria-live="polite">
+            <p class="eyebrow" id="planner-rel">Today</p>
+            <h3 id="planner-date"></h3>
+          </div>
+          <button class="planner-nav" id="planner-next" type="button" aria-label="Next day">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+        <ol class="planner" id="planner-list" aria-label="Hours"></ol>
+        <div class="planner-tools">
+          <button class="link-btn" id="planner-today" type="button" hidden>Back to today</button>
+          <button class="link-btn" id="planner-clear" type="button">Clear this day</button>
+        </div>
+      </div>
+
+      <!-- Raccoon mode: one tap starts a timer that takes over the whole screen. -->
+      <div class="tab-panel raccoon-panel" id="raccoon-panel" role="tabpanel" aria-labelledby="tab-raccoon" hidden>
+        <p class="coon-intro">Pick a timer. It fills the screen so you can scurry, grab one thing, and get out.</p>
+        <div class="coon-grid">
+          <button class="coon-tile" type="button" data-mins="5"><b>5</b><small>Minutes · quick raid</small></button>
+          <button class="coon-tile" type="button" data-mins="10"><b>10</b><small>Minutes · trash run</small></button>
+          <button class="coon-tile" type="button" data-mins="15"><b>15</b><small>Minutes · full heist</small></button>
+          <form class="coon-tile coon-tile--custom" id="coon-custom-form" autocomplete="off">
+            <div class="coon-custom">
+              <label class="sr-only" for="coon-custom-input">Custom timer, minutes</label>
+              <input type="number" id="coon-custom-input" inputmode="numeric" min="1" max="240" step="1" value="25" required>
+              <button class="coon-go" type="submit">Go</button>
+            </div>
+            <small>Custom minutes</small>
+          </form>
+        </div>
       </div>
 
       <button class="big-strip" id="big-strip" type="button" hidden>
@@ -1763,6 +2108,41 @@ body.is-shake .wrap { animation: shake .4s; }
   <div class="boss-hint">Tap to continue</div>
 </div>
 <canvas class="fx" id="fx" aria-hidden="true"></canvas>
+
+<!-- Raccoon mode: the running timer, full screen. "Shrink" tucks it into a corner chip. -->
+<div class="coon" id="coon" role="dialog" aria-modal="true" aria-labelledby="coon-kicker" hidden>
+  <div class="coon-fill" id="coon-fill" aria-hidden="true"></div>
+  <div class="coon-inner">
+    <span class="coon-face" id="coon-face" aria-hidden="true"></span>
+    <p class="coon-kicker" id="coon-kicker">Raccoon mode · 5 min</p>
+    <div class="coon-time" id="coon-time" role="timer" aria-atomic="true">5:00</div>
+    <p class="coon-sub" id="coon-sub"></p>
+    <div class="coon-actions" id="coon-actions">
+      <button class="btn" id="coon-pause" type="button">Pause</button>
+      <button class="btn" id="coon-plus" type="button">+1 min</button>
+      <button class="btn" id="coon-hide" type="button">Shrink</button>
+      <button class="btn btn--danger" id="coon-stop" type="button">Stop</button>
+    </div>
+    <div class="coon-actions" id="coon-done-actions" hidden>
+      <button class="btn" id="coon-again" type="button">Again</button>
+      <button class="btn btn--solid-danger" id="coon-dismiss" type="button">Done</button>
+    </div>
+  </div>
+</div>
+<button class="coon-chip" id="coon-chip" type="button" hidden></button>
+
+<dialog class="modal modal--tabs" id="tabs-dialog" aria-labelledby="tabs-title">
+  <form method="dialog">
+    <p class="eyebrow">Settings</p>
+    <h2 id="tabs-title">Tabs</h2>
+    <p>Switch tabs on or off. Turning one off only hides it; nothing in it is deleted.</p>
+    <ul class="tab-toggles" id="tab-toggles"></ul>
+    <div class="modal-actions">
+      <button class="btn" id="tabs-all" type="button">All on</button>
+      <button class="btn" value="close" type="submit" autofocus>Done</button>
+    </div>
+  </form>
+</dialog>
 
 <!-- Optional cloud sync settings; see firebase-config.js. Missing file = sync stays off. -->
 <script src="firebase-config.js"></script>
@@ -1884,7 +2264,7 @@ body.is-shake .wrap { animation: shake .4s; }
   // A heist that finished while the page was closed has already been paid out.
   if (visibleCompletedMissions.length >= HEIST_SIZE) visibleCompletedMissions = [];
 
-  let currentTab = 'active'; // active (today) | tomorrow | jail
+  let currentTab = 'active'; // active (today) | tomorrow | jail | calendar | notes | planner | raccoon
   let openTray = null;       // which job's action tray is open, e.g. "job-123"
   let ideaIndex = 0;
   const landedIds = new Set();
@@ -1911,8 +2291,23 @@ body.is-shake .wrap { animation: shake .4s; }
   const tabTomorrow = $('tab-tomorrow');
   const tomorrowListEl = $('tomorrow-list');
   const tomorrowEmptyEl = $('tomorrow-empty-state');
-  const TAB_ORDER = ['active', 'tomorrow', 'jail', 'calendar'];
-  const TAB_EL = { active: tabActive, tomorrow: tabTomorrow, jail: tabJail, calendar: $('tab-calendar') };
+  const TAB_ORDER = ['active', 'tomorrow', 'jail', 'calendar', 'notes', 'planner', 'raccoon'];
+  const TAB_EL = {
+    active: tabActive, tomorrow: tabTomorrow, jail: tabJail, calendar: $('tab-calendar'),
+    notes: $('tab-notes'), planner: $('tab-planner'), raccoon: $('tab-raccoon'),
+  };
+  const TAB_NAME = {
+    active: 'Today', tomorrow: 'Tomorrow', jail: 'Jail', calendar: 'Calendar',
+    notes: 'Notes', planner: 'Day planner', raccoon: 'Raccoon mode',
+  };
+  // Tabs that show their own panel instead of a job list.
+  const PANEL_TABS = { calendar: $('calendar-panel'), notes: $('notes-panel'), planner: $('planner-panel'), raccoon: $('raccoon-panel') };
+  // Tabs switched off with the gear. Kept per device, like mute.
+  let tabsOff = (Array.isArray(store.get('mp_tabs_off', [])) ? store.get('mp_tabs_off', []) : [])
+    .filter((t) => TAB_ORDER.includes(t));
+  if (tabsOff.length >= TAB_ORDER.length) tabsOff = [];
+  const isTabOn = (tab) => !tabsOff.includes(tab);
+  const shownTabs = () => TAB_ORDER.filter(isTabOn);
   const calendarPanel = $('calendar-panel');
   const calendarFrame = $('calendar-frame');
   const CALENDAR_URL = '../calendar/?embed=1';
@@ -2023,8 +2418,8 @@ body.is-shake .wrap { animation: shake .4s; }
   const sfx = (() => {
     let ctx = null;
     let out = null;
-    function ready() {
-      if (muted) return false;
+    function ready(force) {
+      if (muted && !force) return false;
       try {
         if (!ctx) {
           const AC = window.AudioContext || window.webkitAudioContext;
@@ -2098,6 +2493,13 @@ body.is-shake .wrap { animation: shake .4s; }
       coin() { if (!ready()) return; tone(988, 0, 0.08, { vol: 0.1 }); tone(1319, 0.07, 0.38, { vol: 0.1 }); tone(2637, 0.07, 0.22, { type: 'sine', vol: 0.05 }); },
       drop() { if (!ready()) return; tone(320, 0, 0.2, { type: 'sawtooth', vol: 0.08, glide: 110, cutoff: 900 }); },
       tick() { if (!ready()) return; tone(1500, 0, 0.03, { vol: 0.045 }); },
+      // Raccoon mode: a little scurry when a timer starts, and an alarm when it ends.
+      scurry() { if (!ready()) return; [880, 1175, 1568].forEach((f, i) => tone(f, i * 0.06, 0.08, { type: 'triangle', vol: 0.14 })); },
+      // The alarm is something you set on purpose, so it rings even when game sounds are muted.
+      alarm() {
+        if (!ready(true)) return;
+        for (let r = 0; r < 3; r++) [0, 0.16, 0.32].forEach((at) => tone(1760, r * 0.9 + at, 0.11, { type: 'square', vol: 0.09, cutoff: 4000 }));
+      },
       // A short police "whoop" that climbs with the wanted level.
       whoop(level) {
         if (!ready()) return;
@@ -2480,6 +2882,9 @@ body.is-shake .wrap { animation: shake .4s; }
   }
 
   function renderBoard() {
+    // A tab switched off with the gear can't be the open one: fall back to the first one shown.
+    if (!isTabOn(currentTab)) { currentTab = shownTabs()[0]; openTray = null; }
+    TAB_ORDER.forEach((tab) => { TAB_EL[tab].hidden = !isTabOn(tab); });
     const active = [];
     const jail = [];
     let five0 = false;
@@ -2511,13 +2916,18 @@ body.is-shake .wrap { animation: shake .4s; }
       TAB_EL[tab].tabIndex = on ? 0 : -1;
     });
 
-    // calendar tab: it has no jobs, so nothing below applies. Load the frame the
-    // first time it's opened, then keep it so coming back is instant.
-    const onCalendar = currentTab === 'calendar';
-    TAB_EL.calendar.setAttribute('aria-selected', String(onCalendar));
-    TAB_EL.calendar.tabIndex = onCalendar ? 0 : -1;
-    calendarPanel.hidden = !onCalendar;
-    if (onCalendar && !calendarFrame.getAttribute('src')) calendarFrame.setAttribute('src', CALENDAR_URL);
+    // calendar, notes, planner, raccoon: no jobs, so nothing below applies. The
+    // calendar frame loads the first time it's opened and stays, so coming back is instant.
+    Object.entries(PANEL_TABS).forEach(([tab, panel]) => {
+      const on = currentTab === tab;
+      TAB_EL[tab].setAttribute('aria-selected', String(on));
+      TAB_EL[tab].tabIndex = on ? 0 : -1;
+      panel.hidden = !on;
+    });
+    const onPanel = currentTab in PANEL_TABS;
+    if (currentTab === 'calendar' && !calendarFrame.getAttribute('src')) calendarFrame.setAttribute('src', CALENDAR_URL);
+    if (currentTab === 'notes') renderNotes();
+    if (currentTab === 'planner') renderPlanner();
 
     $('count-active').textContent = String(active.length);
     $('count-tomorrow').textContent = String(lined.length);
@@ -2526,7 +2936,7 @@ body.is-shake .wrap { animation: shake .4s; }
     jailCount.classList.toggle('is-hot', jail.length > 0);
     jailCount.classList.toggle('is-five0', five0);
 
-    if (onCalendar) {
+    if (onPanel) {
       form.hidden = true;
       $('board-bar').hidden = true;
       renderStrip();
@@ -3529,7 +3939,8 @@ body.is-shake .wrap { animation: shake .4s; }
     if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
     e.preventDefault();
     const step = e.key === 'ArrowRight' ? 1 : -1;
-    const next = TAB_ORDER[(TAB_ORDER.indexOf(currentTab) + step + TAB_ORDER.length) % TAB_ORDER.length];
+    const shown = shownTabs();
+    const next = shown[(shown.indexOf(currentTab) + step + shown.length) % shown.length];
     setTab(next, true);
   });
 
@@ -3944,8 +4355,11 @@ body.is-shake .wrap { animation: shake .4s; }
     if (!overlay.hidden || !boss.hidden) return;
     const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement && document.activeElement.tagName);
     if (!typing && (e.key === '/' || e.key === 'n') && !e.metaKey && !e.ctrlKey && !e.altKey) {
+      if (currentTab !== 'active' && currentTab !== 'tomorrow') {
+        if (!isTabOn('active')) return;
+        setTab('active');
+      }
       e.preventDefault();
-      if (currentTab === 'jail') setTab('active');
       input.focus();
     }
   });
@@ -3974,6 +4388,401 @@ body.is-shake .wrap { animation: shake .4s; }
   const queueSky = () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => paintSky(), 120); };
   if ('ResizeObserver' in window) new ResizeObserver(queueSky).observe($('hero-sky'));
   else window.addEventListener('resize', queueSky);
+
+  // ── Tabs on/off (the gear in the HUD) ──────────────────────────────────
+  const tabsDialog = $('tabs-dialog');
+  const togglesEl = $('tab-toggles');
+  function syncToggles() {
+    const onCount = shownTabs().length;
+    togglesEl.querySelectorAll('input[data-tab]').forEach((cb) => {
+      const on = isTabOn(cb.dataset.tab);
+      cb.checked = on;
+      cb.disabled = on && onCount === 1; // keep at least one tab
+    });
+    $('tabs-all').disabled = tabsOff.length === 0;
+  }
+  function buildToggles() {
+    togglesEl.replaceChildren(...TAB_ORDER.map((tab) => h('li', null,
+      h('label', { class: 'tab-toggle' },
+        h('span', null, TAB_NAME[tab]),
+        h('input', { type: 'checkbox', 'data-tab': tab }),
+        h('span', { class: 'switch', 'aria-hidden': 'true' })))));
+    syncToggles();
+  }
+  function setTabsOff(next) {
+    tabsOff = next;
+    store.set('mp_tabs_off', tabsOff);
+    syncToggles();
+    renderBoard();
+  }
+  $('tabs-btn').addEventListener('click', () => {
+    buildToggles();
+    if (typeof tabsDialog.showModal === 'function') tabsDialog.showModal();
+    else tabsDialog.setAttribute('open', '');
+  });
+  togglesEl.addEventListener('change', (e) => {
+    const cb = e.target.closest('input[data-tab]');
+    if (!cb) return;
+    const tab = cb.dataset.tab;
+    if (cb.checked) setTabsOff(tabsOff.filter((t) => t !== tab));
+    else if (shownTabs().length > 1) setTabsOff(tabsOff.concat(tab));
+    else syncToggles();
+  });
+  $('tabs-all').addEventListener('click', () => setTabsOff([]));
+
+  // ── Notes: saved on this device as you type ────────────────────────────
+  let notes = (Array.isArray(store.get('mp_notes', [])) ? store.get('mp_notes', []) : [])
+    .filter((n) => n && typeof n.text === 'string' && Number.isFinite(n.id) && Number.isFinite(n.updatedAt));
+  const saveNotes = () => store.set('mp_notes', notes);
+  const notesListEl = $('notes-list');
+  const noteForm = $('note-form');
+  const noteInput = $('note-input');
+  const stamp = (t) => new Date(t).toLocaleString('en-US', { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+  const autosize = (ta) => { ta.style.height = 'auto'; ta.style.height = `${ta.scrollHeight}px`; };
+
+  function noteEl(n) {
+    const ta = h('textarea', { rows: '1', maxlength: '5000', 'aria-label': 'Note' });
+    ta.value = n.text;
+    return h('li', { class: 'note', 'data-id': String(n.id) },
+      ta,
+      h('div', { class: 'note-foot' },
+        h('time', null, stamp(n.updatedAt)),
+        h('button', { class: 'note-del', type: 'button', 'aria-label': 'Delete note', icon: ICON.x })));
+  }
+  function renderNotes() {
+    // Don't rebuild under someone's fingers: a note being edited keeps its focus.
+    if (notesListEl.contains(document.activeElement)) return;
+    const newestFirst = notes.slice().sort((a, b) => b.id - a.id);
+    notesListEl.replaceChildren(...newestFirst.map(noteEl));
+    notesListEl.hidden = notes.length === 0;
+    $('notes-empty').hidden = notes.length > 0;
+    notesListEl.querySelectorAll('textarea').forEach(autosize);
+    autosize(noteInput);
+  }
+  noteForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const text = noteInput.value.trim();
+    if (!text) { noteInput.focus(); return; }
+    let id = Date.now();
+    while (notes.some((n) => n.id === id)) id++;
+    notes.push({ id, text, updatedAt: Date.now() });
+    saveNotes();
+    noteInput.value = '';
+    renderNotes();
+    sfx.add();
+    haptic(12);
+    toast('Note saved');
+  });
+  noteInput.addEventListener('input', () => autosize(noteInput));
+  noteInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); noteForm.requestSubmit(); }
+  });
+  const noteOf = (el) => {
+    const li = el.closest('.note');
+    return li ? [li, notes.find((n) => n.id === Number(li.dataset.id))] : [null, null];
+  };
+  notesListEl.addEventListener('input', (e) => {
+    if (e.target.tagName !== 'TEXTAREA') return;
+    const [li, n] = noteOf(e.target);
+    if (!n) return;
+    n.text = e.target.value;
+    n.updatedAt = Date.now();
+    saveNotes();
+    autosize(e.target);
+    li.querySelector('time').textContent = stamp(n.updatedAt);
+  });
+  // A note emptied out and left behind is gone.
+  notesListEl.addEventListener('focusout', (e) => {
+    if (e.target.tagName !== 'TEXTAREA') return;
+    const [, n] = noteOf(e.target);
+    if (!n || n.text.trim()) return;
+    notes = notes.filter((x) => x !== n);
+    saveNotes();
+    setTimeout(renderNotes, 0);
+  });
+  notesListEl.addEventListener('click', (e) => {
+    const btn = e.target.closest('.note-del');
+    if (!btn) return;
+    const [, n] = noteOf(btn);
+    if (!n) return;
+    notes = notes.filter((x) => x !== n);
+    saveNotes();
+    renderNotes();
+    sfx.drop();
+    toast('Note deleted', {
+      action: 'Undo',
+      duration: 6000,
+      onAction: () => { notes.push(n); saveNotes(); renderNotes(); },
+    });
+  });
+
+  // ── Day planner: one line per hour for any day, saved on this device ──
+  const PLAN_FROM = 6;  // 6 AM
+  const PLAN_TO = 23;   // 11 PM
+  const PLAN_KEEP_DAYS = 120;
+  const rawPlanner = store.get('mp_planner', {});
+  let planner = rawPlanner && typeof rawPlanner === 'object' && !Array.isArray(rawPlanner) ? rawPlanner : {};
+  let plannerOffset = 0; // days from today
+  const plannerListEl = $('planner-list');
+  const pad2 = (n) => String(n).padStart(2, '0');
+  const dayKey = (t) => { const d = new Date(t); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; };
+  const plannerDay = () => { const d = new Date(now()); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + plannerOffset); return d.getTime(); };
+  const hourLabel = (hr) => `${hr % 12 || 12} ${hr < 12 ? 'AM' : 'PM'}`;
+  const dayPlan = (key) => (planner[key] && typeof planner[key] === 'object' ? planner[key] : {});
+  function savePlanner() {
+    const oldest = dayKey(now() - PLAN_KEEP_DAYS * DAY_MS);
+    Object.keys(planner).forEach((k) => {
+      if (k < oldest || !Object.keys(dayPlan(k)).length) delete planner[k];
+    });
+    store.set('mp_planner', planner);
+  }
+
+  function renderPlanner() {
+    if (plannerListEl.contains(document.activeElement)) return;
+    const t = plannerDay();
+    const key = dayKey(t);
+    const plan = dayPlan(key);
+    const hourNow = new Date(now()).getHours();
+    const rel = plannerOffset === 0 ? 'Today' : plannerOffset === 1 ? 'Tomorrow' : plannerOffset === -1 ? 'Yesterday'
+      : plannerOffset > 0 ? `In ${plannerOffset} days` : `${-plannerOffset} days ago`;
+    $('planner-rel').textContent = rel;
+    $('planner-date').textContent = new Date(t).toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'short' });
+    $('planner-today').hidden = plannerOffset === 0;
+    $('planner-clear').hidden = !Object.keys(plan).length;
+    const rows = [];
+    for (let hr = PLAN_FROM; hr <= PLAN_TO; hr++) {
+      const isNow = plannerOffset === 0 && hr === hourNow;
+      const isPast = plannerOffset < 0 || (plannerOffset === 0 && hr < hourNow);
+      const text = typeof plan[hr] === 'string' ? plan[hr] : '';
+      const field = h('input', { type: 'text', id: `plan-${hr}`, maxlength: '140', 'data-hour': String(hr), enterkeyhint: 'next', placeholder: isNow ? 'Right now…' : '' });
+      field.value = text;
+      rows.push(h('li', { class: ['slot-row', isNow ? 'is-now' : '', isPast && !isNow ? 'is-past' : '', text ? 'is-filled' : ''].join(' ').trim() },
+        h('label', { for: `plan-${hr}` }, hourLabel(hr)), field));
+    }
+    plannerListEl.replaceChildren(...rows);
+  }
+  plannerListEl.addEventListener('input', (e) => {
+    const hr = e.target.dataset && e.target.dataset.hour;
+    if (!hr) return;
+    const key = dayKey(plannerDay());
+    const plan = Object.assign({}, dayPlan(key));
+    if (e.target.value.trim()) plan[hr] = e.target.value; else delete plan[hr];
+    planner[key] = plan;
+    savePlanner();
+    e.target.parentElement.classList.toggle('is-filled', !!e.target.value.trim());
+    $('planner-clear').hidden = !Object.keys(plan).length;
+  });
+  // Enter jumps to the next hour, like a paper planner.
+  plannerListEl.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' || !e.target.dataset.hour) return;
+    e.preventDefault();
+    const next = $(`plan-${Number(e.target.dataset.hour) + 1}`);
+    if (next) next.focus(); else e.target.blur();
+  });
+  const movePlanner = (to) => { plannerOffset = to; if (plannerListEl.contains(document.activeElement)) document.activeElement.blur(); renderPlanner(); };
+  $('planner-prev').addEventListener('click', () => movePlanner(plannerOffset - 1));
+  $('planner-next').addEventListener('click', () => movePlanner(plannerOffset + 1));
+  $('planner-today').addEventListener('click', () => movePlanner(0));
+  $('planner-clear').addEventListener('click', () => {
+    const key = dayKey(plannerDay());
+    const was = dayPlan(key);
+    if (!Object.keys(was).length) return;
+    delete planner[key];
+    savePlanner();
+    renderPlanner();
+    sfx.drop();
+    toast('Day cleared', {
+      action: 'Undo',
+      duration: 6000,
+      onAction: () => { planner[key] = was; savePlanner(); renderPlanner(); },
+    });
+  });
+  // Keep the "now" hour lit as the clock moves on.
+  setInterval(() => { if (currentTab === 'planner') renderPlanner(); }, 60 * 1000);
+
+  // ── Raccoon mode: full-screen timers ───────────────────────────────────
+  const RACCOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 8.5L4.5 3l4.5 2.8M18.5 8.5l1-5.5L15 5.8"/><path d="M3.5 11c0-3.6 3.8-6 8.5-6s8.5 2.4 8.5 6c0 4.4-3.8 9-8.5 9s-8.5-4.6-8.5-9z"/><path fill="currentColor" stroke="none" fill-rule="evenodd" d="M4 11.2c1.9-1.9 5.4-2.2 8-.6 2.6-1.6 6.1-1.3 8 .6-.4 2-2.3 3.2-4 3.2-1.6 0-2.7-1.1-4-1.1s-2.4 1.1-4 1.1c-1.7 0-3.6-1.2-4-3.2zM9.6 11.6a1.1 1.1 0 10-2.2 0 1.1 1.1 0 002.2 0zM16.6 11.6a1.1 1.1 0 10-2.2 0 1.1 1.1 0 002.2 0z"/><circle cx="12" cy="16.4" r="1.1" fill="currentColor" stroke="none"/></svg>';
+  const COON_LINES = [
+    'Scurry. Grab one thing. Get out.', 'Tiny hands, big haul.', 'In and out before anyone notices.',
+    'Rummage with purpose.', 'Eyes on the prize. Ignore the shiny stuff.', 'One bin at a time.',
+  ];
+  const COON_DONE_LINES = ['Clean getaway. Nice raid.', 'Haul secured.', 'Back to the den. Good work.'];
+  const COON_MAX_MINS = 240;
+  const coonEl = $('coon');
+  const coonChip = $('coon-chip');
+  const coonInput = $('coon-custom-input');
+  const baseTitle = document.title;
+  function cleanCoon(c) {
+    if (!c || !Number.isFinite(c.total) || c.total <= 0 || !Number.isFinite(c.mins)) return null;
+    return {
+      mins: c.mins,
+      total: c.total,
+      endsAt: Number.isFinite(c.endsAt) ? c.endsAt : null,
+      left: Number.isFinite(c.left) ? c.left : null, // set while paused
+      shrunk: c.shrunk === true,
+      line: typeof c.line === 'string' ? c.line : COON_LINES[0],
+      doneLine: typeof c.doneLine === 'string' ? c.doneLine : COON_DONE_LINES[0],
+    };
+  }
+  let coon = cleanCoon(store.get('mp_raccoon', null));
+  if (coon && coon.endsAt == null && coon.left == null) coon = null;
+  let coonDone = false;
+  let coonTicker = 0;
+  let coonAlarmTimer = 0;
+  const saveCoon = () => store.set('mp_raccoon', coon);
+  const coonLeft = () => (!coon ? 0 : coon.left != null ? coon.left : Math.max(0, coon.endsAt - Date.now()));
+  const clock = (ms) => {
+    const s = Math.ceil(ms / 1000);
+    const hh = Math.floor(s / 3600);
+    const mm = Math.floor((s % 3600) / 60);
+    return hh ? `${hh}:${pad2(mm)}:${pad2(s % 60)}` : `${mm}:${pad2(s % 60)}`;
+  };
+  const customMins = toInt(store.get('mp_raccoon_custom', 25));
+  coonInput.value = String(customMins >= 1 && customMins <= COON_MAX_MINS ? customMins : 25);
+
+  function setCoonOpen(open) {
+    coonEl.hidden = !open;
+    // While the timer fills the screen, the app behind it can't be tabbed into or scrolled.
+    document.querySelector('.hud').inert = open;
+    document.querySelector('.wrap').inert = open;
+    document.documentElement.classList.toggle('coon-open', open);
+  }
+  function paintCoon() {
+    if (!coon) return;
+    const left = coonDone ? 0 : coonLeft();
+    const paused = !coonDone && coon.left != null;
+    const time = clock(left);
+    $('coon-time').textContent = time;
+    $('coon-fill').style.height = `${coonDone ? 100 : Math.min(100, (1 - left / coon.total) * 100)}%`;
+    $('coon-kicker').textContent = coonDone ? "Time's up" : `Raccoon mode · ${coon.mins} min${paused ? ' · paused' : ''}`;
+    $('coon-sub').textContent = coonDone ? coon.doneLine || COON_DONE_LINES[0] : coon.line;
+    $('coon-pause').textContent = paused ? 'Resume' : 'Pause';
+    $('coon-actions').hidden = coonDone;
+    $('coon-done-actions').hidden = !coonDone;
+    coonEl.classList.toggle('is-done', coonDone);
+    coonEl.classList.toggle('is-paused', paused);
+    coonChip.classList.toggle('is-done', coonDone);
+    coonChip.lastChild.textContent = coonDone ? "Time's up" : time;
+    coonChip.setAttribute('aria-label', coonDone ? "Raccoon timer: time's up. Open it" : `Raccoon timer: ${time} left. Open it`);
+    document.title = coonDone ? `Time's up! · ${baseTitle}` : `${paused ? '⏸ ' : ''}${time} · ${baseTitle}`;
+  }
+  function showCoon(focus = true) {
+    const shrunk = coon.shrunk && !coonDone;
+    setCoonOpen(!shrunk);
+    coonChip.hidden = !shrunk;
+    paintCoon();
+    clearInterval(coonTicker);
+    coonTicker = setInterval(tickCoon, 250);
+    if (focus && !shrunk) (coonDone ? $('coon-dismiss') : $('coon-pause')).focus();
+  }
+  function tickCoon() {
+    if (!coon) return;
+    if (!coonDone && coon.left == null && coonLeft() <= 0) { finishCoon(true); return; }
+    paintCoon();
+  }
+  function startCoon(mins) {
+    stopAlarm();
+    const total = mins * 60 * 1000;
+    coon = { mins, total, endsAt: Date.now() + total, left: null, shrunk: false, line: pick(COON_LINES), doneLine: pick(COON_DONE_LINES) };
+    coonDone = false;
+    saveCoon();
+    sfx.scurry();
+    haptic(15);
+    showCoon();
+  }
+  function stopAlarm() { clearInterval(coonAlarmTimer); coonAlarmTimer = 0; }
+  function finishCoon(withAlarm) {
+    coonDone = true;
+    coon.shrunk = false;
+    saveCoon();
+    showCoon(withAlarm);
+    if (!withAlarm) return;
+    let rings = 0;
+    const ring = () => {
+      if (!coonDone || rings++ >= 5) { stopAlarm(); return; }
+      sfx.alarm();
+      haptic([300, 150, 300, 150, 300]);
+    };
+    ring();
+    stopAlarm();
+    coonAlarmTimer = setInterval(ring, 4000);
+  }
+  function clearCoon() {
+    stopAlarm();
+    clearInterval(coonTicker);
+    coon = null;
+    coonDone = false;
+    saveCoon();
+    setCoonOpen(false);
+    coonChip.hidden = true;
+    document.title = baseTitle;
+  }
+
+  coonChip.append(iconEl(RACCOON), h('span'));
+  $('coon-face').append(iconEl(RACCOON));
+  document.querySelectorAll('.coon-tile').forEach((tile) => tile.prepend(iconEl(RACCOON)));
+  document.querySelectorAll('.coon-tile[data-mins]').forEach((tile) => {
+    tile.addEventListener('click', () => startCoon(Number(tile.dataset.mins)));
+  });
+  $('coon-custom-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const mins = Math.round(Number(coonInput.value));
+    if (!Number.isFinite(mins) || mins < 1 || mins > COON_MAX_MINS) {
+      toast(`Pick 1 to ${COON_MAX_MINS} minutes`);
+      coonInput.focus();
+      return;
+    }
+    coonInput.value = String(mins);
+    store.set('mp_raccoon_custom', mins);
+    startCoon(mins);
+  });
+  $('coon-pause').addEventListener('click', () => {
+    if (!coon || coonDone) return;
+    if (coon.left != null) { coon.endsAt = Date.now() + coon.left; coon.left = null; }
+    else { coon.left = coonLeft(); coon.endsAt = null; }
+    saveCoon();
+    sfx.tick();
+    paintCoon();
+  });
+  $('coon-plus').addEventListener('click', () => {
+    if (!coon || coonDone) return;
+    if (coon.left != null) coon.left += 60 * 1000; else coon.endsAt += 60 * 1000;
+    coon.total += 60 * 1000;
+    saveCoon();
+    sfx.tick();
+    paintCoon();
+  });
+  $('coon-hide').addEventListener('click', () => {
+    if (!coon) return;
+    coon.shrunk = true;
+    saveCoon();
+    showCoon();
+    coonChip.focus();
+  });
+  coonChip.addEventListener('click', () => {
+    if (!coon) return;
+    coon.shrunk = false;
+    saveCoon();
+    showCoon();
+  });
+  $('coon-stop').addEventListener('click', () => { clearCoon(); sfx.drop(); toast('Timer stopped'); });
+  $('coon-dismiss').addEventListener('click', clearCoon);
+  $('coon-again').addEventListener('click', () => startCoon(coon ? coon.mins : 5));
+  coonEl.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    e.preventDefault();
+    if (coonDone) clearCoon(); else $('coon-hide').click();
+  });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) tickCoon(); });
+
+  // A timer left running when the app was closed: pick it back up. If it ran out
+  // a while ago, just say so rather than ringing.
+  if (coon) {
+    if (coon.left == null && coonLeft() <= 0) {
+      if (Date.now() - coon.endsAt < 10 * 60 * 1000) finishCoon(false);
+      else { clearCoon(); setTimeout(() => toast('Your raccoon timer finished while you were away'), 600); }
+    } else showCoon(false);
+  }
 
   // ── Boot ───────────────────────────────────────────────────────────────
   const landedAtBoot = landTomorrowJobs();
