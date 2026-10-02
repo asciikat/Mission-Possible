@@ -6,8 +6,9 @@ Tabs: **Today**, **Tomorrow**, **Jail**, **Calendar**, **Notes** (quick notes, e
 in place), **Planner** (an hour-by-hour day planner, 6 AM–11 PM, for any day) and
 **Raccoon** (raccoon mode: one-tap 5, 10 and 15 minute timers plus a custom one,
 which fill the whole screen while they run). The **gear** at the top right switches
-any tab on or off; hiding a tab never deletes what's in it. Notes, the planner and
-tab choices are saved on each device only (not in sync or backups yet).
+any tab on or off; hiding a tab never deletes what's in it. Notes and the planner sync
+between devices and are included in Save/Merge backup (newest edit wins; a deleted
+note stays deleted). Tab choices and the running timer stay on each device.
 
 
 ## Host free on GitHub Pages

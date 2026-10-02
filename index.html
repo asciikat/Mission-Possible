@@ -3983,7 +3983,51 @@ body.is-shake .wrap { animation: shake .4s; }
 
   // ── Backup: progress only lives in this browser, so offer a file copy ──
   const BACKUP_KEYS = ['gta_missions', 'gta_visible_completed', 'gta_wins', 'gta_cash', 'gta_time_offset',
-    'gta_heists', 'gta_big_score', 'gta_big_trophies', 'gta_tomorrow', 'gta_gone', 'gta_muted', 'gta_seeded'];
+    'gta_heists', 'gta_big_score', 'gta_big_trophies', 'gta_tomorrow', 'gta_gone', 'gta_muted', 'gta_seeded',
+    'mp_notes', 'mp_notes_gone', 'mp_planner', 'mp_planner_at'];
+
+  // Notes: combined by id; a deleted note stays deleted; the newest edit of a note wins.
+  // Planner: slot by slot, the newest change wins (a cleared slot counts as a change).
+  function mergeNotesAndPlanner(d, sum) {
+    const list = (v) => (Array.isArray(v) ? v : []);
+    const obj = (v) => (v && typeof v === 'object' && !Array.isArray(v) ? v : {});
+    const goneIds = new Set([...notesGone, ...list(d.mp_notes_gone).filter(Number.isFinite)]);
+    notes = notes.filter((n) => !goneIds.has(n.id));
+    list(d.mp_notes).forEach((n) => {
+      if (!n || typeof n.text !== 'string' || !Number.isFinite(n.id) || !Number.isFinite(n.updatedAt) || goneIds.has(n.id)) return;
+      const mine = notes.find((x) => x.id === n.id);
+      if (!mine) { notes.push({ id: n.id, text: n.text.slice(0, 5000), updatedAt: n.updatedAt }); sum.notes = (sum.notes || 0) + 1; }
+      else if (n.updatedAt > mine.updatedAt) { mine.text = n.text.slice(0, 5000); mine.updatedAt = n.updatedAt; sum.notes = (sum.notes || 0) + 1; }
+    });
+    notesGone = Array.from(goneIds).slice(-500);
+
+    const oldest = dayKey(now() - PLAN_KEEP_DAYS * DAY_MS);
+    const theirPlan = obj(d.mp_planner);
+    const theirAt = obj(d.mp_planner_at);
+    new Set([...Object.keys(theirPlan), ...Object.keys(theirAt)]).forEach((key) => {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(key) || key < oldest) return;
+      const rp = obj(theirPlan[key]);
+      const ra = obj(theirAt[key]);
+      new Set([...Object.keys(rp), ...Object.keys(ra)]).forEach((hr) => {
+        const h24 = Number(hr);
+        if (!Number.isInteger(h24) || h24 < PLAN_FROM || h24 > PLAN_TO) return;
+        const rText = typeof rp[hr] === 'string' ? rp[hr].slice(0, 140) : '';
+        const rStamp = Number.isFinite(ra[hr]) ? ra[hr] : 0;
+        const mine = dayPlan(key);
+        const lText = typeof mine[hr] === 'string' ? mine[hr] : '';
+        const lStamp = Number((plannerAt[key] || {})[hr]) || 0;
+        // Both untouched-since-before-stamps: fill an empty slot rather than lose text.
+        if (!(rStamp > lStamp || (rStamp === lStamp && !lText && rText))) return;
+        const adoptStamp = () => { if (rStamp) { stampSlot(key, hr); plannerAt[key][hr] = rStamp; } };
+        if (rText === lText) { adoptStamp(); return; }
+        const plan = Object.assign({}, mine);
+        if (rText) plan[hr] = rText; else delete plan[hr];
+        if (Object.keys(plan).length) planner[key] = plan; else delete planner[key];
+        adoptStamp();
+        sum.slots = (sum.slots || 0) + 1;
+      });
+    });
+  }
 
   // Merge a backup into what is on this device. Nothing is overwritten:
   // jobs are combined by id, jobs finished or dropped on either device stay gone,
@@ -4048,9 +4092,13 @@ body.is-shake .wrap { animation: shake .4s; }
     });
     trophies = trophies.sort((a, b) => b.at - a.at).slice(0, 100);
 
+    mergeNotesAndPlanner(d, sum);
+
     gone = Array.from(goneSet).slice(-500);
     store.set('gta_seeded', true);
     saveData();
+    saveNotes();
+    savePlanner();
     renderUI();
     return sum;
   }
@@ -4190,6 +4238,7 @@ body.is-shake .wrap { animation: shake .4s; }
       gta_missions: missions, gta_tomorrow: tomorrowMissions, gta_visible_completed: visibleCompletedMissions,
       gta_wins: totalWinsCount, gta_cash: totalCash, gta_heists: heistsScored,
       gta_big_score: bigScore, gta_big_trophies: trophies, gta_gone: gone,
+      mp_notes: notes, mp_notes_gone: notesGone, mp_planner: planner, mp_planner_at: plannerAt,
     }));
     const load = (src) => new Promise((resolve, reject) => {
       const s = document.createElement('script');
@@ -4209,6 +4258,24 @@ body.is-shake .wrap { animation: shake .4s; }
       if (trophies.length > list(d.gta_big_trophies).length) return true;
       const theirs = new Map(list(d.gta_missions).map((m) => [m && m.id, m]));
       if (missions.some((m) => (m.heatAt || 0) > ((theirs.get(m.id) || {}).heatAt || 0))) return true;
+      const theirNotes = new Map(list(d.mp_notes).map((n) => [n && n.id, n]));
+      if (notes.some((n) => !theirNotes.has(n.id) || n.updatedAt > theirNotes.get(n.id).updatedAt)) return true;
+      const theirNotesGone = new Set(list(d.mp_notes_gone));
+      if (notesGone.some((g) => !theirNotesGone.has(g))) return true;
+      const tpa = d.mp_planner_at && typeof d.mp_planner_at === 'object' ? d.mp_planner_at : {};
+      const tpp = d.mp_planner && typeof d.mp_planner === 'object' ? d.mp_planner : {};
+      const stampOf = (src, key, hr) => Number((src[key] || {})[hr]) || 0;
+      for (const key of Object.keys(plannerAt)) {
+        for (const hr of Object.keys(plannerAt[key] || {})) {
+          if (stampOf(plannerAt, key, hr) > stampOf(tpa, key, hr)) return true;
+        }
+      }
+      for (const key of Object.keys(planner)) {
+        for (const hr of Object.keys(dayPlan(key))) {
+          // text with no newer stamp on the cloud side, and not there at all: upload it
+          if (stampOf(plannerAt, key, hr) === stampOf(tpa, key, hr) && !(tpp[key] || {})[hr]) return true;
+        }
+      }
       const tb = d.gta_big_score;
       if (bigScore && !tb) return true;
       if (bigScore && tb && tb.id === bigScore.id) {
@@ -4228,6 +4295,8 @@ body.is-shake .wrap { animation: shake .4s; }
         if (sum.lined) bits.push(`${sum.lined} lined up`);
         if (sum.removed) bits.push(`${sum.removed} done or moved`);
         if (sum.updated) bits.push(`${sum.updated} starred`);
+        if (sum.notes) bits.push(`${sum.notes} note${sum.notes === 1 ? '' : 's'}`);
+        if (sum.slots) bits.push(`${sum.slots} planner slot${sum.slots === 1 ? '' : 's'}`);
         if (bits.length) toast(`Synced · ${bits.join(' · ')}`);
       }
       if (cloudIsBehind(d || {})) schedule(1500);
@@ -4433,7 +4502,14 @@ body.is-shake .wrap { animation: shake .4s; }
   // ── Notes: saved on this device as you type ────────────────────────────
   let notes = (Array.isArray(store.get('mp_notes', [])) ? store.get('mp_notes', []) : [])
     .filter((n) => n && typeof n.text === 'string' && Number.isFinite(n.id) && Number.isFinite(n.updatedAt));
-  const saveNotes = () => store.set('mp_notes', notes);
+  // Ids of notes deleted on this device, so a sync or merge doesn't bring them back.
+  let notesGone = (Array.isArray(store.get('mp_notes_gone', [])) ? store.get('mp_notes_gone', []) : []).filter(Number.isFinite);
+  const markNoteGone = (id) => { if (!notesGone.includes(id)) notesGone = notesGone.concat(id).slice(-500); };
+  const saveNotes = () => {
+    store.set('mp_notes', notes);
+    store.set('mp_notes_gone', notesGone);
+    if (onSaved) onSaved();
+  };
   const notesListEl = $('notes-list');
   const noteForm = $('note-form');
   const noteInput = $('note-input');
@@ -4497,6 +4573,7 @@ body.is-shake .wrap { animation: shake .4s; }
     const [, n] = noteOf(e.target);
     if (!n || n.text.trim()) return;
     notes = notes.filter((x) => x !== n);
+    markNoteGone(n.id);
     saveNotes();
     setTimeout(renderNotes, 0);
   });
@@ -4506,13 +4583,21 @@ body.is-shake .wrap { animation: shake .4s; }
     const [, n] = noteOf(btn);
     if (!n) return;
     notes = notes.filter((x) => x !== n);
+    markNoteGone(n.id);
+    holdSync();
     saveNotes();
     renderNotes();
     sfx.drop();
     toast('Note deleted', {
       action: 'Undo',
       duration: 6000,
-      onAction: () => { notes.push(n); saveNotes(); renderNotes(); },
+      onAction: () => {
+        notesGone = notesGone.filter((g) => g !== n.id);
+        n.updatedAt = Date.now();
+        notes.push(n);
+        saveNotes();
+        renderNotes();
+      },
     });
   });
 
@@ -4522,6 +4607,9 @@ body.is-shake .wrap { animation: shake .4s; }
   const PLAN_KEEP_DAYS = 120;
   const rawPlanner = store.get('mp_planner', {});
   let planner = rawPlanner && typeof rawPlanner === 'object' && !Array.isArray(rawPlanner) ? rawPlanner : {};
+  // When each hour slot was last changed (ms), cleared slots included, so the newest edit wins when devices sync.
+  const rawPlanAt = store.get('mp_planner_at', {});
+  let plannerAt = rawPlanAt && typeof rawPlanAt === 'object' && !Array.isArray(rawPlanAt) ? rawPlanAt : {};
   let plannerOffset = 0; // days from today
   const plannerListEl = $('planner-list');
   const pad2 = (n) => String(n).padStart(2, '0');
@@ -4534,8 +4622,15 @@ body.is-shake .wrap { animation: shake .4s; }
     Object.keys(planner).forEach((k) => {
       if (k < oldest || !Object.keys(dayPlan(k)).length) delete planner[k];
     });
+    Object.keys(plannerAt).forEach((k) => { if (k < oldest) delete plannerAt[k]; });
     store.set('mp_planner', planner);
+    store.set('mp_planner_at', plannerAt);
+    if (onSaved) onSaved();
   }
+  const stampSlot = (key, hr) => {
+    if (!plannerAt[key] || typeof plannerAt[key] !== 'object') plannerAt[key] = {};
+    plannerAt[key][hr] = Date.now();
+  };
 
   function renderPlanner() {
     if (plannerListEl.contains(document.activeElement)) return;
@@ -4568,6 +4663,7 @@ body.is-shake .wrap { animation: shake .4s; }
     const plan = Object.assign({}, dayPlan(key));
     if (e.target.value.trim()) plan[hr] = e.target.value; else delete plan[hr];
     planner[key] = plan;
+    stampSlot(key, hr);
     savePlanner();
     e.target.parentElement.classList.toggle('is-filled', !!e.target.value.trim());
     $('planner-clear').hidden = !Object.keys(plan).length;
@@ -4588,13 +4684,20 @@ body.is-shake .wrap { animation: shake .4s; }
     const was = dayPlan(key);
     if (!Object.keys(was).length) return;
     delete planner[key];
+    Object.keys(was).forEach((hr) => stampSlot(key, hr));
+    holdSync();
     savePlanner();
     renderPlanner();
     sfx.drop();
     toast('Day cleared', {
       action: 'Undo',
       duration: 6000,
-      onAction: () => { planner[key] = was; savePlanner(); renderPlanner(); },
+      onAction: () => {
+        planner[key] = was;
+        Object.keys(was).forEach((hr) => stampSlot(key, hr));
+        savePlanner();
+        renderPlanner();
+      },
     });
   });
   // Keep the "now" hour lit as the clock moves on.
