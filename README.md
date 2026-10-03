@@ -10,6 +10,10 @@ what's in it. The **raccoon icon** next to it opens raccoon mode: one-tap 5, 10 
 Score** is the slim gold bar under the banner; tap it to plan it, add prep steps or
 cash it in.
 
+Notes and jobs trade places: each note has **Today** and **Tomorrow** buttons that turn it
+into a job (jobs are one line, 140 letters max), and a job's menu (tap its text) has
+**Move to notes**. Every move has Undo.
+
 Notes sync between devices and are included in Save/Merge backup (newest edit wins; a
 deleted note stays deleted). Tab choices and the running timer stay on each device.
 

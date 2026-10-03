@@ -877,6 +877,7 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
 }
 .tray-btn svg { width: 16px; height: 16px; }
 .tray-btn--dusk { border-color: rgba(154, 107, 255, .5); color: var(--dusk-ink); }
+.tray-btn--note { border-color: rgba(255, 209, 102, .5); color: var(--gold); }
 .tray-btn--danger { border-color: rgba(255, 51, 73, .45); color: #ff6b7a; }
 .job.is-open { border-color: rgba(255, 255, 255, .26); }
 /* wanted level 3+: the cops are on it; 5: full lights */
@@ -1504,6 +1505,23 @@ body.is-shake .wrap { animation: shake .4s; }
 .note:focus-within { border-color: rgba(255, 209, 102, .55); border-left-color: var(--gold); }
 .note-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 10px 6px; }
 .note-foot time { font: 600 12px/1 var(--font-hud); letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+.note-actions { display: flex; align-items: center; gap: 6px; }
+.note-move {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 32px;
+  padding: 0 9px;
+  border: 1px solid rgba(255, 155, 61, .5);
+  background: rgba(255, 155, 61, .06);
+  color: var(--flare);
+  font: 700 12px/1 var(--font-hud);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.note-move svg { width: 15px; height: 15px; }
+.note-move--dusk { border-color: rgba(154, 107, 255, .5); background: rgba(154, 107, 255, .06); color: var(--dusk-ink); }
 .note-del { display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; background: none; color: var(--dim); cursor: pointer; }
 .note-del svg { width: 16px; height: 16px; }
 .empty--notes > svg { color: var(--gold); }
@@ -1741,6 +1759,8 @@ body.is-shake .wrap { animation: shake .4s; }
   .icon-btn { width: 34px; height: 34px; }
   .icon-btn svg { width: 18px; height: 18px; }
   .tab-panel { padding: 10px 12px 12px; }
+  .note-foot time { display: none; }
+  .note-foot { justify-content: flex-end; }
   .coon-tile { min-height: 124px; padding: 12px; }
 }
 @media (min-width: 720px) {
@@ -2277,6 +2297,7 @@ body.is-shake .wrap { animation: shake .4s; }
     soundOn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" stroke="none"/><path d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>',
     moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg>',
     sunrise: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V6M6.5 11.5L12 6l5.5 5.5"/></svg>',
+    note: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4M9 12h7M9 16h7"/></svg>',
     crown: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5L3 8z"/></svg>',
     trophy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M7 4h10v5a5 5 0 01-10 0V4z"/><path d="M7 6H4v1a3 3 0 003 3M17 6h3v1a3 3 0 01-3 3M12 14v3M8 20h8M9.5 17h5"/></svg>',
     soundOff: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" stroke="none"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5"/></svg>',
@@ -2797,6 +2818,7 @@ body.is-shake .wrap { animation: shake .4s; }
       h('div', { class: 'job-tray', id: `tray-${key}`, hidden: !open },
         heat ? h('button', { class: 'tray-btn', type: 'button', 'data-act': 'cool' }, iconEl(ICON.star), 'Reset stars') : null,
         jail ? null : h('button', { class: 'tray-btn tray-btn--dusk', type: 'button', 'data-act': 'tomorrow' }, iconEl(ICON.moon), 'Push to tomorrow'),
+        isTabOn('notes') ? h('button', { class: 'tray-btn tray-btn--note', type: 'button', 'data-act': 'note' }, iconEl(ICON.note), 'Move to notes') : null,
         h('button', { class: 'tray-btn tray-btn--danger', type: 'button', 'data-act': 'drop' }, iconEl(ICON.x), 'Drop job'),
       ),
     );
@@ -2816,6 +2838,7 @@ body.is-shake .wrap { animation: shake .4s; }
       h('span', { class: 'pay' }, money(calculateReward(0))),
       h('div', { class: 'job-tray', id: `tray-${key}`, hidden: !open },
         h('button', { class: 'tray-btn', type: 'button', 'data-act': 'today' }, iconEl(ICON.sunrise), 'Do it today'),
+        isTabOn('notes') ? h('button', { class: 'tray-btn tray-btn--note', type: 'button', 'data-act': 'note' }, iconEl(ICON.note), 'Move to notes') : null,
         h('button', { class: 'tray-btn tray-btn--danger', type: 'button', 'data-act': 'drop' }, iconEl(ICON.x), 'Drop job'),
       ),
     );
@@ -3862,6 +3885,7 @@ body.is-shake .wrap { animation: shake .4s; }
     if (act === 'toggle') { toggleTray(card); return; }
     if (card.classList.contains('job--tomorrow')) {
       if (act === 'today') moveToToday(id);
+      else if (act === 'note') jobToNote(id);
       else if (act === 'drop') dropTomorrow(id, card);
       return;
     }
@@ -3869,6 +3893,7 @@ body.is-shake .wrap { animation: shake .4s; }
     if (act === 'done') completeMission(id, btn);
     else if (act === 'drop') dropMission(id, btn);
     else if (act === 'tomorrow') pushToTomorrow(id, card);
+    else if (act === 'note') jobToNote(id);
     else if (act === 'heat') raiseHeat(id, btn);
     else if (act === 'cool') coolDown(id, card);
   }
@@ -4431,11 +4456,15 @@ body.is-shake .wrap { animation: shake .4s; }
       ta,
       h('div', { class: 'note-foot' },
         h('time', null, stamp(n.updatedAt)),
-        h('button', { class: 'note-del', type: 'button', 'aria-label': 'Delete note', icon: ICON.x })));
+        h('span', { class: 'note-actions' },
+          isTabOn('active') ? h('button', { class: 'note-move', type: 'button', 'data-to': 'today', 'aria-label': 'Make this a job for today' }, iconEl(ICON.sunrise), 'Today') : null,
+          isTabOn('tomorrow') ? h('button', { class: 'note-move note-move--dusk', type: 'button', 'data-to': 'tomorrow', 'aria-label': 'Line this up for tomorrow' }, iconEl(ICON.moon), 'Tomorrow') : null,
+          h('button', { class: 'note-del', type: 'button', 'aria-label': 'Delete note', icon: ICON.x }))));
   }
   function renderNotes() {
     // Don't rebuild under someone's fingers: a note being edited keeps its focus.
-    if (notesListEl.contains(document.activeElement)) return;
+    const ae = document.activeElement;
+    if (ae && ae.tagName === 'TEXTAREA' && notesListEl.contains(ae)) return;
     const newestFirst = notes.slice().sort((a, b) => b.id - a.id);
     notesListEl.replaceChildren(...newestFirst.map(noteEl));
     notesListEl.hidden = notes.length === 0;
@@ -4485,7 +4514,86 @@ body.is-shake .wrap { animation: shake .4s; }
     saveNotes();
     setTimeout(renderNotes, 0);
   });
+  // Notes and jobs trade places. The moved item gets a fresh id and the old one is marked gone,
+  // so the move carries over to other devices instead of leaving a copy in both places.
+  const uniqueId = () => {
+    let id = Date.now();
+    const taken = (x) => x.id === id;
+    while (notes.some(taken) || missions.some(taken) || tomorrowMissions.some(taken)) id++;
+    return id;
+  };
+  function noteToJob(n, when) {
+    const text = n.text.trim().replace(/\s+/g, ' ');
+    if (!text) { toast('That note is empty'); return; }
+    if (text.length > 140) { toast('Too long for a job (140 letters max). Trim the note first.', { duration: 3600 }); return; }
+    notes = notes.filter((x) => x !== n);
+    markNoteGone(n.id);
+    const id = uniqueId();
+    const job = when === 'tomorrow'
+      ? { id, text, startsAt: nextMorning(now()) }
+      : { id, text, createdAt: now() };
+    if (when === 'tomorrow') tomorrowMissions.push(job); else missions.push(job);
+    justAddedId = id;
+    holdSync();
+    saveNotes();
+    saveData();
+    renderUI();
+    sfx.add();
+    haptic(12);
+    toast(when === 'tomorrow' ? `Lined up · lands ${landLabel(job.startsAt)}` : 'Moved to today', {
+      action: 'Undo',
+      duration: 6000,
+      onAction: () => {
+        missions = missions.filter((m) => m.id !== id);
+        tomorrowMissions = tomorrowMissions.filter((m) => m.id !== id);
+        markGone(id);
+        notesGone = notesGone.filter((g) => g !== n.id);
+        n.updatedAt = Date.now();
+        notes.push(n);
+        saveNotes();
+        saveData();
+        renderUI();
+      },
+    });
+  }
+  function jobToNote(id) {
+    const fromToday = missions.findIndex((m) => m.id === id);
+    const fromTomorrow = fromToday < 0 ? tomorrowMissions.findIndex((m) => m.id === id) : -1;
+    if (fromToday < 0 && fromTomorrow < 0) return;
+    const job = fromToday >= 0 ? missions.splice(fromToday, 1)[0] : tomorrowMissions.splice(fromTomorrow, 1)[0];
+    markGone(id);
+    if (pickedId === id) pickedId = null;
+    openTray = null;
+    const note = { id: uniqueId(), text: job.text, updatedAt: Date.now() };
+    notes.push(note);
+    holdSync();
+    saveNotes();
+    saveData();
+    renderUI();
+    sfx.lock();
+    haptic(10);
+    toast('Moved to notes', {
+      action: 'Undo',
+      duration: 6000,
+      onAction: () => {
+        notes = notes.filter((n) => n !== note);
+        markNoteGone(note.id);
+        if (fromToday >= 0) missions.splice(Math.min(fromToday, missions.length), 0, job);
+        else tomorrowMissions.splice(Math.min(fromTomorrow, tomorrowMissions.length), 0, job);
+        unmarkGone(id);
+        saveNotes();
+        saveData();
+        renderUI();
+      },
+    });
+  }
   notesListEl.addEventListener('click', (e) => {
+    const move = e.target.closest('.note-move');
+    if (move) {
+      const [, n] = noteOf(move);
+      if (n) noteToJob(n, move.dataset.to);
+      return;
+    }
     const btn = e.target.closest('.note-del');
     if (!btn) return;
     const [, n] = noteOf(btn);
