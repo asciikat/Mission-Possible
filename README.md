@@ -2,13 +2,16 @@
 
 The Mission Board to-do list with a **Calendar** tab. Single page: `index.html` (the calendar tab shows the separate calendar at `../calendar/`).
 
-Tabs: **Today**, **Tomorrow**, **Jail**, **Calendar**, **Notes** (quick notes, edit
-in place), **Planner** (an hour-by-hour day planner, 6 AM–11 PM, for any day) and
-**Raccoon** (raccoon mode: one-tap 5, 10 and 15 minute timers plus a custom one,
-which fill the whole screen while they run). The **gear** at the top right switches
-any tab on or off; hiding a tab never deletes what's in it. Notes and the planner sync
-between devices and are included in Save/Merge backup (newest edit wins; a deleted
-note stays deleted). Tab choices and the running timer stay on each device.
+Tabs: **Today**, **Tomorrow**, **Jail**, **Ezycal** (the calendar) and **Notes**. The
+**gear** at the top right switches any tab on or off; hiding a tab never deletes
+what's in it. The **raccoon icon** next to it opens raccoon mode: one-tap 5, 10 and
+15 minute timers plus a custom one, which fill the whole screen while they run
+(Shrink tucks one into a corner chip; tap the icon to bring it back). **The Big
+Score** is the slim gold bar under the banner; tap it to plan it, add prep steps or
+cash it in.
+
+Notes sync between devices and are included in Save/Merge backup (newest edit wins; a
+deleted note stays deleted). Tab choices and the running timer stay on each device.
 
 
 ## Host free on GitHub Pages
