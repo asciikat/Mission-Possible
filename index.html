@@ -294,9 +294,9 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
 .layout { display: flex; flex-direction: column; gap: 16px; }
 .side { display: contents; }
 .board { order: 1; }
-.big { order: 2; scroll-margin-top: 76px; }
-.heist { order: 3; }
-.intel { order: 4; }
+.big { scroll-margin-top: 76px; }
+.heist { order: 2; }
+.intel { order: 3; }
 
 .panel {
   position: relative;
@@ -455,32 +455,57 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
   position: relative;
   padding: 2px;
   background: conic-gradient(from var(--spin), var(--gold), var(--flare), var(--neon), #9a6bff, var(--palm), var(--gold));
-  box-shadow: 0 24px 60px -28px rgba(255, 170, 60, .6);
+  box-shadow: 0 14px 40px -24px rgba(255, 170, 60, .6);
   animation: spin 7s linear infinite;
 }
 @keyframes spin { to { --spin: 360deg; } }
 .big-inner {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 18px;
   background:
-    radial-gradient(120% 90% at 100% 0%, rgba(255, 209, 102, .14), transparent 55%),
-    linear-gradient(180deg, #1c150c, #130e19 65%);
+    radial-gradient(120% 140% at 100% 0%, rgba(255, 209, 102, .14), transparent 55%),
+    linear-gradient(180deg, #1c150c, #130e19 85%);
 }
-.big-empty, .big-active { display: flex; flex-direction: column; gap: 14px; }
-.big-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-.big-head .eyebrow { color: var(--gold); }
-.big-pay { text-align: right; white-space: nowrap; }
-.big-pay small {
-  display: block;
-  margin-bottom: 2px;
-  font: 700 11px/1 var(--font-hud);
-  letter-spacing: .16em;
-  text-transform: uppercase;
+/* collapsed: one slim row. Tap it to plan the big score or open its prep steps. */
+.big-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  padding: 8px 14px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+.big-bar-icon { flex: none; width: 22px; height: 22px; color: var(--gold); }
+.big-bar-title { flex: none; font: 900 22px/1 var(--font-display); letter-spacing: .02em; text-transform: uppercase; }
+.big-bar-text {
+  flex: 1;
+  min-width: 0;
+  font: 600 15px/1.25 var(--font-body);
   color: var(--smog);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.big-pay b { display: block; font: 900 50px/.9 var(--font-display); color: var(--gold); text-shadow: 0 0 24px rgba(255, 209, 102, .35); }
+.big-bar.is-planned .big-bar-text { color: var(--ink); }
+.big-bar-meta { flex: none; font: 700 13px/1 var(--font-hud); letter-spacing: .1em; text-transform: uppercase; color: var(--cash); }
+.big-bar-pay { flex: none; font: 900 26px/1 var(--font-display); color: var(--gold); text-shadow: 0 0 18px rgba(255, 209, 102, .35); }
+.big-bar-chev { flex: none; width: 18px; height: 18px; color: var(--smog); transition: transform .2s; }
+.big-bar[aria-expanded="true"] .big-bar-chev { transform: rotate(180deg); }
+.big-bar:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--gold); }
+.big-body { display: flex; flex-direction: column; gap: 14px; padding: 4px 16px 16px; }
+@media (max-width: 719px) {
+  .big-bar { gap: 8px; padding: 6px 10px; min-height: 46px; }
+  .big-bar-icon { width: 18px; height: 18px; }
+  .big-bar-title { font-size: 16px; }
+  .big-bar-text { font-size: 14px; }
+  .big-bar-pay { font-size: 22px; }
+  .big-bar-chev { width: 16px; height: 16px; }
+}
+@media (max-width: 380px) { .big-bar-meta { display: none; } }
+.big-empty, .big-active { display: flex; flex-direction: column; gap: 14px; }
 .big-pitch { margin: 0; color: var(--smog); max-width: 52ch; }
 .big-form, .prep-form { display: flex; gap: 8px; }
 .big-form input, .prep-form input {
@@ -852,6 +877,7 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
 }
 .tray-btn svg { width: 16px; height: 16px; }
 .tray-btn--dusk { border-color: rgba(154, 107, 255, .5); color: var(--dusk-ink); }
+.tray-btn--note { border-color: rgba(255, 209, 102, .5); color: var(--gold); }
 .tray-btn--danger { border-color: rgba(255, 51, 73, .45); color: #ff6b7a; }
 .job.is-open { border-color: rgba(255, 255, 255, .26); }
 /* wanted level 3+: the cops are on it; 5: full lights */
@@ -880,25 +906,6 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
 .job--tomorrow .job-age { color: var(--dusk-ink); }
 .job--tomorrow .job-meta svg { color: var(--dusk-ink); }
 .job--tomorrow .pay { color: rgba(124, 242, 154, .55); }
-
-/* big-score shortcut at the foot of today's list (phones) */
-.big-strip {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: calc(100% - 32px);
-  margin: 0 16px 16px;
-  padding: 10px 12px;
-  border: 1px dashed rgba(255, 209, 102, .5);
-  background: rgba(255, 209, 102, .07);
-  color: var(--ink);
-  text-align: left;
-  cursor: pointer;
-}
-.big-strip > svg { flex: none; width: 20px; height: 20px; color: var(--gold); }
-.big-strip-text { flex: 1; min-width: 0; font: 600 15px/1.25 var(--font-body); overflow-wrap: anywhere; }
-.big-strip-text small { display: block; font: 700 11px/1 var(--font-hud); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); margin-bottom: 3px; }
-.big-strip-meta { flex: none; font: 900 20px/1 var(--font-display); color: var(--gold); }
 
 /* last call: day 5–6 pays double */
 .job--lastcall {
@@ -989,7 +996,7 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
   .mini-x:hover { color: var(--neon); }
   .tray-btn:hover { background: rgba(255, 255, 255, .1); }
   .job--tomorrow .job-done:hover { background: var(--dusk); border-color: var(--dusk); color: var(--shade); }
-  .big-strip:hover { background: rgba(255, 209, 102, .14); }
+  .big-bar:hover .big-bar-chev { color: var(--ink); }
   .big-plan:hover { filter: brightness(1.08); }
   .preps li:not(.is-done) .prep-done:hover { background: rgba(255, 209, 102, .16); }
   .prep-form button:hover { background: rgba(255, 209, 102, .18); }
@@ -1458,10 +1465,8 @@ body.is-shake .wrap { animation: shake .4s; }
 .tab-toggle input:disabled + .switch { opacity: .5; }
 .tab-toggle:has(input:not(:checked)) > span:first-child { color: var(--dim); }
 
-/* ───────────────────────── notes, planner and raccoon tabs ───────────────────────── */
+/* ───────────────────────── notes tab and raccoon timer ───────────────────────── */
 #tab-notes[aria-selected="true"]::after { background: var(--gold); }
-#tab-planner[aria-selected="true"]::after { background: var(--flare); }
-#tab-raccoon[aria-selected="true"]::after { background: var(--siren-b); }
 .tab-panel { padding: 12px 16px 16px; }
 
 /* notes: a quick-jot box, then every note as an editable card, newest first */
@@ -1500,60 +1505,27 @@ body.is-shake .wrap { animation: shake .4s; }
 .note:focus-within { border-color: rgba(255, 209, 102, .55); border-left-color: var(--gold); }
 .note-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 10px 6px; }
 .note-foot time { font: 600 12px/1 var(--font-hud); letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+.note-actions { display: flex; align-items: center; gap: 6px; }
+.note-move {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 32px;
+  padding: 0 9px;
+  border: 1px solid rgba(255, 155, 61, .5);
+  background: rgba(255, 155, 61, .06);
+  color: var(--flare);
+  font: 700 12px/1 var(--font-hud);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.note-move svg { width: 15px; height: 15px; }
+.note-move--dusk { border-color: rgba(154, 107, 255, .5); background: rgba(154, 107, 255, .06); color: var(--dusk-ink); }
 .note-del { display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; background: none; color: var(--dim); cursor: pointer; }
 .note-del svg { width: 16px; height: 16px; }
 .empty--notes > svg { color: var(--gold); }
 .empty--notes { margin: 12px 0 0; }
-
-/* day planner: one line per hour, the current hour lit up */
-.planner-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-.planner-day { flex: 1; min-width: 0; text-align: center; }
-.planner-day .eyebrow { margin: 0 0 4px; color: var(--flare); }
-.planner-day h3 { margin: 0; font: 900 26px/1 var(--font-display); text-transform: uppercase; }
-.planner-nav {
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 42px;
-  height: 42px;
-  padding: 0;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, .04);
-  color: var(--smog);
-  cursor: pointer;
-}
-.planner-nav svg { width: 20px; height: 20px; }
-.planner-tools { display: flex; justify-content: space-between; gap: 12px; margin-top: 10px; }
-.planner { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
-.slot-row {
-  display: grid;
-  grid-template-columns: 62px minmax(0, 1fr);
-  align-items: center;
-  background: rgba(255, 255, 255, .025);
-  border-left: 3px solid transparent;
-}
-.slot-row label {
-  padding: 0 0 0 10px;
-  font: 700 15px/1 var(--font-hud);
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--dim);
-  font-variant-numeric: tabular-nums;
-}
-.slot-row input {
-  min-width: 0;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: var(--ink);
-  padding: 11px 10px;
-  font: 600 16px/1.2 var(--font-body);
-}
-.slot-row:focus-within { background: var(--asphalt-hi); border-left-color: var(--smog); }
-.slot-row.is-filled label { color: var(--smog); }
-.slot-row.is-past { opacity: .55; }
-.slot-row.is-now { border-left-color: var(--flare); background: rgba(255, 155, 61, .09); opacity: 1; }
-.slot-row.is-now label { color: var(--flare); }
 
 /* raccoon mode: big quick-start timers that fill the board */
 .coon-intro { margin: 0 0 12px; color: var(--smog); }
@@ -1582,6 +1554,23 @@ body.is-shake .wrap { animation: shake .4s; }
 .coon-tile--custom { cursor: default; border-color: rgba(46, 230, 200, .45); background: linear-gradient(160deg, rgba(46, 230, 200, .13), rgba(46, 230, 200, .02)); }
 .coon-tile--custom small { color: var(--palm); }
 .coon-tile--custom > svg { display: none; }
+.modal--coon { width: min(520px, calc(100% - 32px)); border-color: rgba(61, 123, 255, .45); }
+.modal--coon .eyebrow { color: #9bb8ff; }
+.modal--coon .coon-grid { margin-top: 16px; }
+.modal--coon .coon-tile { min-height: 124px; padding: 12px 14px; }
+#coon-btn { position: relative; color: #9bb8ff; border-color: rgba(61, 123, 255, .45); }
+#coon-btn.is-running::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 8px;
+  height: 8px;
+  background: var(--palm);
+  box-shadow: 0 0 8px var(--palm);
+  animation: sirenBadge 1.2s steps(2, jump-none) infinite;
+}
+#coon-btn.is-done::after { background: var(--gold); box-shadow: 0 0 8px var(--gold); }
 .coon-custom { display: flex; align-items: flex-end; gap: 8px; width: 100%; }
 .coon-custom input {
   width: 100%;
@@ -1696,8 +1685,7 @@ body.is-shake .wrap { animation: shake .4s; }
   .board-bar { padding: 12px 20px 0; }
   .jobs { padding: 12px 20px 22px; gap: 10px; }
   .empty { margin: 20px; }
-  .big-strip { width: calc(100% - 40px); margin: 0 20px 20px; }
-  .big-inner { padding: 22px; }
+  .big-body { padding: 6px 22px 22px; }
   .job { padding: 10px 16px 10px 10px; column-gap: 14px; }
   .siren { margin: -10px -16px 8px -10px; }
   .job-done { width: 48px; height: 48px; }
@@ -1713,7 +1701,6 @@ body.is-shake .wrap { animation: shake .4s; }
   }
   .board { grid-column: 1; grid-row: 1; min-height: 560px; }
   .side { display: flex; flex-direction: column; gap: 20px; grid-column: 2; grid-row: 1; }
-  .big-strip { display: none; }
   .hold-btn { font-size: 22px; }
 }
 /* phones: squeeze the chrome so today's jobs sit near the top of the screen */
@@ -1747,7 +1734,6 @@ body.is-shake .wrap { animation: shake .4s; }
   .empty > svg { width: 40px; height: 40px; }
   .empty h3 { font-size: 22px; }
   .empty p { font-size: 15px; }
-  .big-strip { width: calc(100% - 24px); margin: 0 12px 12px; }
 }
 @media (max-width: 719px) and (max-height: 720px) {
   .hero { padding: 9px 12px 11px; }
@@ -1773,6 +1759,8 @@ body.is-shake .wrap { animation: shake .4s; }
   .icon-btn { width: 34px; height: 34px; }
   .icon-btn svg { width: 18px; height: 18px; }
   .tab-panel { padding: 10px 12px 12px; }
+  .note-foot time { display: none; }
+  .note-foot { justify-content: flex-end; }
   .coon-tile { min-height: 124px; padding: 12px; }
 }
 @media (min-width: 720px) {
@@ -1812,6 +1800,7 @@ body.is-shake .wrap { animation: shake .4s; }
       <button class="icon-btn icon-btn--install" id="install-hud" type="button" aria-label="Install Mission Possible as an app" title="Install app" hidden>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></svg>
       </button>
+      <button class="icon-btn" id="coon-btn" type="button" aria-haspopup="dialog" aria-label="Raccoon timers" title="Raccoon timers"></button>
       <button class="icon-btn" id="mute-btn" type="button" aria-pressed="false" aria-label="Mute sound"></button>
       <button class="icon-btn" id="tabs-btn" type="button" aria-haspopup="dialog" aria-label="Choose which tabs to show" title="Tabs">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
@@ -1828,60 +1817,63 @@ body.is-shake .wrap { animation: shake .4s; }
     <p class="hero-tag">Every job pays. Even the tiny ones.</p>
   </section>
 
-  <div class="layout">
-    <div class="side">
-      <section class="big" id="big" aria-labelledby="big-title">
-        <div class="big-inner">
-          <div class="big-head">
-            <div>
-              <p class="eyebrow">One hard job · no timer</p>
-              <h2 class="panel-title" id="big-title">The Big Score</h2>
-            </div>
-            <div class="big-pay"><small>Pays</small><b>$500</b></div>
-          </div>
+  <section class="big" id="big" aria-labelledby="big-title">
+      <div class="big-inner">
+        <button class="big-bar" id="big-toggle" type="button" aria-expanded="false" aria-controls="big-body">
+          <svg class="big-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5L3 8z"/></svg>
+          <span class="big-bar-title" id="big-title">The Big Score</span>
+          <span class="big-bar-text" id="big-bar-text">One hard job. No timer.</span>
+          <span class="big-bar-meta" id="big-bar-meta"></span>
+          <b class="big-bar-pay">$500</b>
+          <svg class="big-bar-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="big-body" id="big-body" hidden>
 
-          <div class="big-empty" id="big-empty">
-            <p class="big-pitch">Got a job you keep dodging? Make it the big score. Break it into tiny prep steps that pay as you go, then cash in big.</p>
-            <form class="big-form" id="big-form" autocomplete="off">
-              <label class="sr-only" for="big-input">Your big score</label>
-              <input type="text" id="big-input" maxlength="140" enterkeyhint="done" placeholder="e.g. do my tax return">
-              <button type="submit" class="big-plan">Plan it</button>
-            </form>
-          </div>
+        <div class="big-empty" id="big-empty">
+          <p class="big-pitch">Got a job you keep dodging? Make it the big score. Break it into tiny prep steps that pay as you go, then cash in big.</p>
+          <form class="big-form" id="big-form" autocomplete="off">
+            <label class="sr-only" for="big-input">Your big score</label>
+            <input type="text" id="big-input" maxlength="140" enterkeyhint="done" placeholder="e.g. do my tax return">
+            <button type="submit" class="big-plan">Plan it</button>
+          </form>
+        </div>
 
-          <div class="big-active" id="big-active" hidden>
-            <p class="big-text" id="big-text"></p>
-            <div class="preps-head">
-              <p class="eyebrow">Prep jobs <b id="prep-count">0/0</b></p>
-              <span class="prep-pay">+$25 each</span>
-            </div>
-            <ul class="preps" id="preps" aria-label="Prep jobs"></ul>
-            <form class="prep-form" id="prep-form" autocomplete="off">
-              <label class="sr-only" for="prep-input">Add a prep step</label>
-              <input type="text" id="prep-input" maxlength="100" enterkeyhint="done" placeholder="Add a tiny first step">
-              <button type="submit" aria-label="Add prep step">+</button>
-            </form>
-            <div class="hold-wrap">
-              <button class="hold-btn" id="hold-btn" type="button" aria-describedby="hold-hint">
-                <span class="hold-fill" aria-hidden="true"></span>
-                <span class="hold-label" id="hold-label">Hold to cash in $500</span>
-                <span class="hold-label-top" id="hold-label-top" aria-hidden="true">Hold to cash in $500</span>
-              </button>
-              <p class="hold-hint" id="hold-hint">Did the big one? Press and hold for 2 seconds.</p>
-            </div>
-            <div class="big-foot">
-              <span id="big-since"></span>
-              <button class="link-btn" id="big-cancel" type="button">Call it off</button>
-            </div>
+        <div class="big-active" id="big-active" hidden>
+          <p class="big-text" id="big-text"></p>
+          <div class="preps-head">
+            <p class="eyebrow">Prep jobs <b id="prep-count">0/0</b></p>
+            <span class="prep-pay">+$25 each</span>
           </div>
-
-          <div class="trophies" id="trophies" hidden>
-            <p class="eyebrow">Trophy wall · <b id="trophy-count">0</b> pulled off</p>
-            <ul class="trophy-list" id="trophy-list"></ul>
+          <ul class="preps" id="preps" aria-label="Prep jobs"></ul>
+          <form class="prep-form" id="prep-form" autocomplete="off">
+            <label class="sr-only" for="prep-input">Add a prep step</label>
+            <input type="text" id="prep-input" maxlength="100" enterkeyhint="done" placeholder="Add a tiny first step">
+            <button type="submit" aria-label="Add prep step">+</button>
+          </form>
+          <div class="hold-wrap">
+            <button class="hold-btn" id="hold-btn" type="button" aria-describedby="hold-hint">
+              <span class="hold-fill" aria-hidden="true"></span>
+              <span class="hold-label" id="hold-label">Hold to cash in $500</span>
+              <span class="hold-label-top" id="hold-label-top" aria-hidden="true">Hold to cash in $500</span>
+            </button>
+            <p class="hold-hint" id="hold-hint">Did the big one? Press and hold for 2 seconds.</p>
+          </div>
+          <div class="big-foot">
+            <span id="big-since"></span>
+            <button class="link-btn" id="big-cancel" type="button">Call it off</button>
           </div>
         </div>
-      </section>
 
+        <div class="trophies" id="trophies" hidden>
+          <p class="eyebrow">Trophy wall · <b id="trophy-count">0</b> pulled off</p>
+          <ul class="trophy-list" id="trophy-list"></ul>
+        </div>
+        </div>
+      </div>
+    </section>
+
+  <div class="layout">
+    <div class="side">
       <section class="panel heist" aria-labelledby="heist-title">
         <div class="heist-head">
           <div>
@@ -1923,10 +1915,8 @@ body.is-shake .wrap { animation: shake .4s; }
           <button class="tab" id="tab-active" role="tab" type="button" aria-selected="true" aria-controls="active-list">Today <span class="count" id="count-active">0</span></button>
           <button class="tab" id="tab-tomorrow" role="tab" type="button" aria-selected="false" aria-controls="tomorrow-list" tabindex="-1">Tomorrow <span class="count" id="count-tomorrow">0</span></button>
           <button class="tab" id="tab-jail" role="tab" type="button" aria-selected="false" aria-controls="jail-list" tabindex="-1">Jail <span class="count" id="count-jail">0</span></button>
-          <button class="tab" id="tab-calendar" role="tab" type="button" aria-selected="false" aria-controls="calendar-panel" tabindex="-1">Calendar</button>
+          <button class="tab" id="tab-calendar" role="tab" type="button" aria-selected="false" aria-controls="calendar-panel" tabindex="-1">Ezycal</button>
           <button class="tab" id="tab-notes" role="tab" type="button" aria-selected="false" aria-controls="notes-panel" tabindex="-1">Notes</button>
-          <button class="tab" id="tab-planner" role="tab" type="button" aria-selected="false" aria-controls="planner-panel" tabindex="-1">Planner</button>
-          <button class="tab" id="tab-raccoon" role="tab" type="button" aria-selected="false" aria-controls="raccoon-panel" tabindex="-1">Raccoon</button>
         </div>
       </div>
 
@@ -1979,7 +1969,7 @@ body.is-shake .wrap { animation: shake .4s; }
       <!-- The calendar is its own page (../calendar/), shown here in a frame. It loads the
            first time you open the tab, and keeps its own data, so it can't disturb the board. -->
       <div class="calendar-panel" id="calendar-panel" role="tabpanel" aria-labelledby="tab-calendar" hidden>
-        <iframe id="calendar-frame" title="Calendar" loading="lazy"></iframe>
+        <iframe id="calendar-frame" title="Ezycal" loading="lazy"></iframe>
       </div>
 
       <!-- Notes: saved on this device as you type. -->
@@ -2005,50 +1995,6 @@ body.is-shake .wrap { animation: shake .4s; }
         </div>
       </div>
 
-      <!-- Day planner: an hour-by-hour plan for any day, saved on this device. -->
-      <div class="tab-panel planner-panel" id="planner-panel" role="tabpanel" aria-labelledby="tab-planner" hidden>
-        <div class="planner-head">
-          <button class="planner-nav" id="planner-prev" type="button" aria-label="Previous day">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
-          </button>
-          <div class="planner-day" aria-live="polite">
-            <p class="eyebrow" id="planner-rel">Today</p>
-            <h3 id="planner-date"></h3>
-          </div>
-          <button class="planner-nav" id="planner-next" type="button" aria-label="Next day">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
-          </button>
-        </div>
-        <ol class="planner" id="planner-list" aria-label="Hours"></ol>
-        <div class="planner-tools">
-          <button class="link-btn" id="planner-today" type="button" hidden>Back to today</button>
-          <button class="link-btn" id="planner-clear" type="button">Clear this day</button>
-        </div>
-      </div>
-
-      <!-- Raccoon mode: one tap starts a timer that takes over the whole screen. -->
-      <div class="tab-panel raccoon-panel" id="raccoon-panel" role="tabpanel" aria-labelledby="tab-raccoon" hidden>
-        <p class="coon-intro">Pick a timer. It fills the screen so you can scurry, grab one thing, and get out.</p>
-        <div class="coon-grid">
-          <button class="coon-tile" type="button" data-mins="5"><b>5</b><small>Minutes · quick raid</small></button>
-          <button class="coon-tile" type="button" data-mins="10"><b>10</b><small>Minutes · trash run</small></button>
-          <button class="coon-tile" type="button" data-mins="15"><b>15</b><small>Minutes · full heist</small></button>
-          <form class="coon-tile coon-tile--custom" id="coon-custom-form" autocomplete="off">
-            <div class="coon-custom">
-              <label class="sr-only" for="coon-custom-input">Custom timer, minutes</label>
-              <input type="number" id="coon-custom-input" inputmode="numeric" min="1" max="240" step="1" value="25" required>
-              <button class="coon-go" type="submit">Go</button>
-            </div>
-            <small>Custom minutes</small>
-          </form>
-        </div>
-      </div>
-
-      <button class="big-strip" id="big-strip" type="button" hidden>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5L3 8z"/></svg>
-        <span class="big-strip-text"><small>Big score</small><span id="big-strip-text"></span></span>
-        <span class="big-strip-meta" id="big-strip-meta"></span>
-      </button>
     </section>
   </div>
 
@@ -2130,6 +2076,30 @@ body.is-shake .wrap { animation: shake .4s; }
   </div>
 </div>
 <button class="coon-chip" id="coon-chip" type="button" hidden></button>
+
+<dialog class="modal modal--coon" id="coon-dialog" aria-labelledby="coon-dialog-title">
+  <form method="dialog">
+    <p class="eyebrow">Raccoon mode</p>
+    <h2 id="coon-dialog-title">Pick a timer</h2>
+    <p>It fills the screen so you can scurry, grab one thing, and get out.</p>
+    <div class="coon-grid">
+      <button class="coon-tile" type="button" data-mins="5"><b>5</b><small>Minutes</small></button>
+      <button class="coon-tile" type="button" data-mins="10"><b>10</b><small>Minutes</small></button>
+      <button class="coon-tile" type="button" data-mins="15"><b>15</b><small>Minutes</small></button>
+      <div class="coon-tile coon-tile--custom" id="coon-custom-form">
+        <div class="coon-custom">
+          <label class="sr-only" for="coon-custom-input">Custom timer, minutes</label>
+          <input type="number" id="coon-custom-input" inputmode="numeric" min="1" max="240" step="1" value="25" required>
+          <button class="coon-go" id="coon-go" type="button">Go</button>
+        </div>
+        <small>Custom minutes</small>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" value="close" type="submit">Close</button>
+    </div>
+  </form>
+</dialog>
 
 <dialog class="modal modal--tabs" id="tabs-dialog" aria-labelledby="tabs-title">
   <form method="dialog">
@@ -2264,7 +2234,7 @@ body.is-shake .wrap { animation: shake .4s; }
   // A heist that finished while the page was closed has already been paid out.
   if (visibleCompletedMissions.length >= HEIST_SIZE) visibleCompletedMissions = [];
 
-  let currentTab = 'active'; // active (today) | tomorrow | jail | calendar | notes | planner | raccoon
+  let currentTab = 'active'; // active (today) | tomorrow | jail | calendar | notes
   let openTray = null;       // which job's action tray is open, e.g. "job-123"
   let ideaIndex = 0;
   const landedIds = new Set();
@@ -2291,17 +2261,17 @@ body.is-shake .wrap { animation: shake .4s; }
   const tabTomorrow = $('tab-tomorrow');
   const tomorrowListEl = $('tomorrow-list');
   const tomorrowEmptyEl = $('tomorrow-empty-state');
-  const TAB_ORDER = ['active', 'tomorrow', 'jail', 'calendar', 'notes', 'planner', 'raccoon'];
+  const TAB_ORDER = ['active', 'tomorrow', 'jail', 'calendar', 'notes'];
   const TAB_EL = {
     active: tabActive, tomorrow: tabTomorrow, jail: tabJail, calendar: $('tab-calendar'),
-    notes: $('tab-notes'), planner: $('tab-planner'), raccoon: $('tab-raccoon'),
+    notes: $('tab-notes'),
   };
   const TAB_NAME = {
-    active: 'Today', tomorrow: 'Tomorrow', jail: 'Jail', calendar: 'Calendar',
-    notes: 'Notes', planner: 'Day planner', raccoon: 'Raccoon mode',
+    active: 'Today', tomorrow: 'Tomorrow', jail: 'Jail', calendar: 'Ezycal',
+    notes: 'Notes',
   };
   // Tabs that show their own panel instead of a job list.
-  const PANEL_TABS = { calendar: $('calendar-panel'), notes: $('notes-panel'), planner: $('planner-panel'), raccoon: $('raccoon-panel') };
+  const PANEL_TABS = { calendar: $('calendar-panel'), notes: $('notes-panel') };
   // Tabs switched off with the gear. Kept per device, like mute.
   let tabsOff = (Array.isArray(store.get('mp_tabs_off', [])) ? store.get('mp_tabs_off', []) : [])
     .filter((t) => TAB_ORDER.includes(t));
@@ -2327,6 +2297,7 @@ body.is-shake .wrap { animation: shake .4s; }
     soundOn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" stroke="none"/><path d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>',
     moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg>',
     sunrise: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V6M6.5 11.5L12 6l5.5 5.5"/></svg>',
+    note: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4M9 12h7M9 16h7"/></svg>',
     crown: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5L3 8z"/></svg>',
     trophy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M7 4h10v5a5 5 0 01-10 0V4z"/><path d="M7 6H4v1a3 3 0 003 3M17 6h3v1a3 3 0 01-3 3M12 14v3M8 20h8M9.5 17h5"/></svg>',
     soundOff: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" stroke="none"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5"/></svg>',
@@ -2847,6 +2818,7 @@ body.is-shake .wrap { animation: shake .4s; }
       h('div', { class: 'job-tray', id: `tray-${key}`, hidden: !open },
         heat ? h('button', { class: 'tray-btn', type: 'button', 'data-act': 'cool' }, iconEl(ICON.star), 'Reset stars') : null,
         jail ? null : h('button', { class: 'tray-btn tray-btn--dusk', type: 'button', 'data-act': 'tomorrow' }, iconEl(ICON.moon), 'Push to tomorrow'),
+        isTabOn('notes') ? h('button', { class: 'tray-btn tray-btn--note', type: 'button', 'data-act': 'note' }, iconEl(ICON.note), 'Move to notes') : null,
         h('button', { class: 'tray-btn tray-btn--danger', type: 'button', 'data-act': 'drop' }, iconEl(ICON.x), 'Drop job'),
       ),
     );
@@ -2866,19 +2838,26 @@ body.is-shake .wrap { animation: shake .4s; }
       h('span', { class: 'pay' }, money(calculateReward(0))),
       h('div', { class: 'job-tray', id: `tray-${key}`, hidden: !open },
         h('button', { class: 'tray-btn', type: 'button', 'data-act': 'today' }, iconEl(ICON.sunrise), 'Do it today'),
+        isTabOn('notes') ? h('button', { class: 'tray-btn tray-btn--note', type: 'button', 'data-act': 'note' }, iconEl(ICON.note), 'Move to notes') : null,
         h('button', { class: 'tray-btn tray-btn--danger', type: 'button', 'data-act': 'drop' }, iconEl(ICON.x), 'Drop job'),
       ),
     );
   }
 
+  // The Big Score bar: what it's about and how far along the prep steps are.
   function renderStrip() {
-    const strip = $('big-strip');
-    strip.hidden = !bigScore || currentTab !== 'active';
-    if (!bigScore) return;
-    const done = bigScore.preps.filter((pr) => pr.done).length;
-    $('big-strip-text').textContent = bigScore.text;
-    $('big-strip-meta').textContent = bigScore.preps.length ? `${done}/${bigScore.preps.length}` : money(BIG_PAY);
-    strip.setAttribute('aria-label', `Big score: ${bigScore.text}. Go to the big score`);
+    const bar = $('big-toggle');
+    bar.classList.toggle('is-planned', !!bigScore);
+    $('big-bar-text').textContent = bigScore ? bigScore.text : 'One hard job. No timer.';
+    const done = bigScore ? bigScore.preps.filter((pr) => pr.done).length : 0;
+    $('big-bar-meta').textContent = bigScore && bigScore.preps.length ? `${done}/${bigScore.preps.length}` : '';
+    bar.setAttribute('aria-label', bigScore
+      ? `The Big Score: ${bigScore.text}. ${bigScore.preps.length ? `${done} of ${bigScore.preps.length} prep steps done. ` : ''}Pays ${money(BIG_PAY)}.`
+      : `The Big Score: one hard job, no timer. Pays ${money(BIG_PAY)}.`);
+  }
+  function setBigOpen(open) {
+    $('big-body').hidden = !open;
+    $('big-toggle').setAttribute('aria-expanded', String(open));
   }
 
   function renderBoard() {
@@ -2916,7 +2895,7 @@ body.is-shake .wrap { animation: shake .4s; }
       TAB_EL[tab].tabIndex = on ? 0 : -1;
     });
 
-    // calendar, notes, planner, raccoon: no jobs, so nothing below applies. The
+    // ezycal (the calendar) and notes: no jobs, so nothing below applies. The
     // calendar frame loads the first time it's opened and stays, so coming back is instant.
     Object.entries(PANEL_TABS).forEach(([tab, panel]) => {
       const on = currentTab === tab;
@@ -2927,7 +2906,6 @@ body.is-shake .wrap { animation: shake .4s; }
     const onPanel = currentTab in PANEL_TABS;
     if (currentTab === 'calendar' && !calendarFrame.getAttribute('src')) calendarFrame.setAttribute('src', CALENDAR_URL);
     if (currentTab === 'notes') renderNotes();
-    if (currentTab === 'planner') renderPlanner();
 
     $('count-active').textContent = String(active.length);
     $('count-tomorrow').textContent = String(lined.length);
@@ -3907,6 +3885,7 @@ body.is-shake .wrap { animation: shake .4s; }
     if (act === 'toggle') { toggleTray(card); return; }
     if (card.classList.contains('job--tomorrow')) {
       if (act === 'today') moveToToday(id);
+      else if (act === 'note') jobToNote(id);
       else if (act === 'drop') dropTomorrow(id, card);
       return;
     }
@@ -3914,14 +3893,13 @@ body.is-shake .wrap { animation: shake .4s; }
     if (act === 'done') completeMission(id, btn);
     else if (act === 'drop') dropMission(id, btn);
     else if (act === 'tomorrow') pushToTomorrow(id, card);
+    else if (act === 'note') jobToNote(id);
     else if (act === 'heat') raiseHeat(id, btn);
     else if (act === 'cool') coolDown(id, card);
   }
   [activeListEl, tomorrowListEl, jailListEl].forEach((list) => list.addEventListener('click', onListClick));
 
-  $('big-strip').addEventListener('click', () => {
-    $('big').scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' });
-  });
+  $('big-toggle').addEventListener('click', () => setBigOpen($('big-body').hidden));
 
   completedListEl.addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-index]');
@@ -3983,7 +3961,22 @@ body.is-shake .wrap { animation: shake .4s; }
 
   // ── Backup: progress only lives in this browser, so offer a file copy ──
   const BACKUP_KEYS = ['gta_missions', 'gta_visible_completed', 'gta_wins', 'gta_cash', 'gta_time_offset',
-    'gta_heists', 'gta_big_score', 'gta_big_trophies', 'gta_tomorrow', 'gta_gone', 'gta_muted', 'gta_seeded'];
+    'gta_heists', 'gta_big_score', 'gta_big_trophies', 'gta_tomorrow', 'gta_gone', 'gta_muted', 'gta_seeded',
+    'mp_notes', 'mp_notes_gone'];
+
+  // Notes: combined by id; a deleted note stays deleted; the newest edit of a note wins.
+  function mergeNotes(d, sum) {
+    const list = (v) => (Array.isArray(v) ? v : []);
+    const goneIds = new Set([...notesGone, ...list(d.mp_notes_gone).filter(Number.isFinite)]);
+    notes = notes.filter((n) => !goneIds.has(n.id));
+    list(d.mp_notes).forEach((n) => {
+      if (!n || typeof n.text !== 'string' || !Number.isFinite(n.id) || !Number.isFinite(n.updatedAt) || goneIds.has(n.id)) return;
+      const mine = notes.find((x) => x.id === n.id);
+      if (!mine) { notes.push({ id: n.id, text: n.text.slice(0, 5000), updatedAt: n.updatedAt }); sum.notes = (sum.notes || 0) + 1; }
+      else if (n.updatedAt > mine.updatedAt) { mine.text = n.text.slice(0, 5000); mine.updatedAt = n.updatedAt; sum.notes = (sum.notes || 0) + 1; }
+    });
+    notesGone = Array.from(goneIds).slice(-500);
+  }
 
   // Merge a backup into what is on this device. Nothing is overwritten:
   // jobs are combined by id, jobs finished or dropped on either device stay gone,
@@ -4048,9 +4041,12 @@ body.is-shake .wrap { animation: shake .4s; }
     });
     trophies = trophies.sort((a, b) => b.at - a.at).slice(0, 100);
 
+    mergeNotes(d, sum);
+
     gone = Array.from(goneSet).slice(-500);
     store.set('gta_seeded', true);
     saveData();
+    saveNotes();
     renderUI();
     return sum;
   }
@@ -4190,6 +4186,7 @@ body.is-shake .wrap { animation: shake .4s; }
       gta_missions: missions, gta_tomorrow: tomorrowMissions, gta_visible_completed: visibleCompletedMissions,
       gta_wins: totalWinsCount, gta_cash: totalCash, gta_heists: heistsScored,
       gta_big_score: bigScore, gta_big_trophies: trophies, gta_gone: gone,
+      mp_notes: notes, mp_notes_gone: notesGone,
     }));
     const load = (src) => new Promise((resolve, reject) => {
       const s = document.createElement('script');
@@ -4209,6 +4206,10 @@ body.is-shake .wrap { animation: shake .4s; }
       if (trophies.length > list(d.gta_big_trophies).length) return true;
       const theirs = new Map(list(d.gta_missions).map((m) => [m && m.id, m]));
       if (missions.some((m) => (m.heatAt || 0) > ((theirs.get(m.id) || {}).heatAt || 0))) return true;
+      const theirNotes = new Map(list(d.mp_notes).map((n) => [n && n.id, n]));
+      if (notes.some((n) => !theirNotes.has(n.id) || n.updatedAt > theirNotes.get(n.id).updatedAt)) return true;
+      const theirNotesGone = new Set(list(d.mp_notes_gone));
+      if (notesGone.some((g) => !theirNotesGone.has(g))) return true;
       const tb = d.gta_big_score;
       if (bigScore && !tb) return true;
       if (bigScore && tb && tb.id === bigScore.id) {
@@ -4228,6 +4229,7 @@ body.is-shake .wrap { animation: shake .4s; }
         if (sum.lined) bits.push(`${sum.lined} lined up`);
         if (sum.removed) bits.push(`${sum.removed} done or moved`);
         if (sum.updated) bits.push(`${sum.updated} starred`);
+        if (sum.notes) bits.push(`${sum.notes} note${sum.notes === 1 ? '' : 's'}`);
         if (bits.length) toast(`Synced · ${bits.join(' · ')}`);
       }
       if (cloudIsBehind(d || {})) schedule(1500);
@@ -4433,7 +4435,14 @@ body.is-shake .wrap { animation: shake .4s; }
   // ── Notes: saved on this device as you type ────────────────────────────
   let notes = (Array.isArray(store.get('mp_notes', [])) ? store.get('mp_notes', []) : [])
     .filter((n) => n && typeof n.text === 'string' && Number.isFinite(n.id) && Number.isFinite(n.updatedAt));
-  const saveNotes = () => store.set('mp_notes', notes);
+  // Ids of notes deleted on this device, so a sync or merge doesn't bring them back.
+  let notesGone = (Array.isArray(store.get('mp_notes_gone', [])) ? store.get('mp_notes_gone', []) : []).filter(Number.isFinite);
+  const markNoteGone = (id) => { if (!notesGone.includes(id)) notesGone = notesGone.concat(id).slice(-500); };
+  const saveNotes = () => {
+    store.set('mp_notes', notes);
+    store.set('mp_notes_gone', notesGone);
+    if (onSaved) onSaved();
+  };
   const notesListEl = $('notes-list');
   const noteForm = $('note-form');
   const noteInput = $('note-input');
@@ -4447,11 +4456,15 @@ body.is-shake .wrap { animation: shake .4s; }
       ta,
       h('div', { class: 'note-foot' },
         h('time', null, stamp(n.updatedAt)),
-        h('button', { class: 'note-del', type: 'button', 'aria-label': 'Delete note', icon: ICON.x })));
+        h('span', { class: 'note-actions' },
+          isTabOn('active') ? h('button', { class: 'note-move', type: 'button', 'data-to': 'today', 'aria-label': 'Make this a job for today' }, iconEl(ICON.sunrise), 'Today') : null,
+          isTabOn('tomorrow') ? h('button', { class: 'note-move note-move--dusk', type: 'button', 'data-to': 'tomorrow', 'aria-label': 'Line this up for tomorrow' }, iconEl(ICON.moon), 'Tomorrow') : null,
+          h('button', { class: 'note-del', type: 'button', 'aria-label': 'Delete note', icon: ICON.x }))));
   }
   function renderNotes() {
     // Don't rebuild under someone's fingers: a note being edited keeps its focus.
-    if (notesListEl.contains(document.activeElement)) return;
+    const ae = document.activeElement;
+    if (ae && ae.tagName === 'TEXTAREA' && notesListEl.contains(ae)) return;
     const newestFirst = notes.slice().sort((a, b) => b.id - a.id);
     notesListEl.replaceChildren(...newestFirst.map(noteEl));
     notesListEl.hidden = notes.length === 0;
@@ -4497,108 +4510,112 @@ body.is-shake .wrap { animation: shake .4s; }
     const [, n] = noteOf(e.target);
     if (!n || n.text.trim()) return;
     notes = notes.filter((x) => x !== n);
+    markNoteGone(n.id);
     saveNotes();
     setTimeout(renderNotes, 0);
   });
+  // Notes and jobs trade places. The moved item gets a fresh id and the old one is marked gone,
+  // so the move carries over to other devices instead of leaving a copy in both places.
+  const uniqueId = () => {
+    let id = Date.now();
+    const taken = (x) => x.id === id;
+    while (notes.some(taken) || missions.some(taken) || tomorrowMissions.some(taken)) id++;
+    return id;
+  };
+  function noteToJob(n, when) {
+    const text = n.text.trim().replace(/\s+/g, ' ');
+    if (!text) { toast('That note is empty'); return; }
+    if (text.length > 140) { toast('Too long for a job (140 letters max). Trim the note first.', { duration: 3600 }); return; }
+    notes = notes.filter((x) => x !== n);
+    markNoteGone(n.id);
+    const id = uniqueId();
+    const job = when === 'tomorrow'
+      ? { id, text, startsAt: nextMorning(now()) }
+      : { id, text, createdAt: now() };
+    if (when === 'tomorrow') tomorrowMissions.push(job); else missions.push(job);
+    justAddedId = id;
+    holdSync();
+    saveNotes();
+    saveData();
+    renderUI();
+    sfx.add();
+    haptic(12);
+    toast(when === 'tomorrow' ? `Lined up · lands ${landLabel(job.startsAt)}` : 'Moved to today', {
+      action: 'Undo',
+      duration: 6000,
+      onAction: () => {
+        missions = missions.filter((m) => m.id !== id);
+        tomorrowMissions = tomorrowMissions.filter((m) => m.id !== id);
+        markGone(id);
+        notesGone = notesGone.filter((g) => g !== n.id);
+        n.updatedAt = Date.now();
+        notes.push(n);
+        saveNotes();
+        saveData();
+        renderUI();
+      },
+    });
+  }
+  function jobToNote(id) {
+    const fromToday = missions.findIndex((m) => m.id === id);
+    const fromTomorrow = fromToday < 0 ? tomorrowMissions.findIndex((m) => m.id === id) : -1;
+    if (fromToday < 0 && fromTomorrow < 0) return;
+    const job = fromToday >= 0 ? missions.splice(fromToday, 1)[0] : tomorrowMissions.splice(fromTomorrow, 1)[0];
+    markGone(id);
+    if (pickedId === id) pickedId = null;
+    openTray = null;
+    const note = { id: uniqueId(), text: job.text, updatedAt: Date.now() };
+    notes.push(note);
+    holdSync();
+    saveNotes();
+    saveData();
+    renderUI();
+    sfx.lock();
+    haptic(10);
+    toast('Moved to notes', {
+      action: 'Undo',
+      duration: 6000,
+      onAction: () => {
+        notes = notes.filter((n) => n !== note);
+        markNoteGone(note.id);
+        if (fromToday >= 0) missions.splice(Math.min(fromToday, missions.length), 0, job);
+        else tomorrowMissions.splice(Math.min(fromTomorrow, tomorrowMissions.length), 0, job);
+        unmarkGone(id);
+        saveNotes();
+        saveData();
+        renderUI();
+      },
+    });
+  }
   notesListEl.addEventListener('click', (e) => {
+    const move = e.target.closest('.note-move');
+    if (move) {
+      const [, n] = noteOf(move);
+      if (n) noteToJob(n, move.dataset.to);
+      return;
+    }
     const btn = e.target.closest('.note-del');
     if (!btn) return;
     const [, n] = noteOf(btn);
     if (!n) return;
     notes = notes.filter((x) => x !== n);
+    markNoteGone(n.id);
+    holdSync();
     saveNotes();
     renderNotes();
     sfx.drop();
     toast('Note deleted', {
       action: 'Undo',
       duration: 6000,
-      onAction: () => { notes.push(n); saveNotes(); renderNotes(); },
+      onAction: () => {
+        notesGone = notesGone.filter((g) => g !== n.id);
+        n.updatedAt = Date.now();
+        notes.push(n);
+        saveNotes();
+        renderNotes();
+      },
     });
   });
-
-  // ── Day planner: one line per hour for any day, saved on this device ──
-  const PLAN_FROM = 6;  // 6 AM
-  const PLAN_TO = 23;   // 11 PM
-  const PLAN_KEEP_DAYS = 120;
-  const rawPlanner = store.get('mp_planner', {});
-  let planner = rawPlanner && typeof rawPlanner === 'object' && !Array.isArray(rawPlanner) ? rawPlanner : {};
-  let plannerOffset = 0; // days from today
-  const plannerListEl = $('planner-list');
-  const pad2 = (n) => String(n).padStart(2, '0');
-  const dayKey = (t) => { const d = new Date(t); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; };
-  const plannerDay = () => { const d = new Date(now()); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + plannerOffset); return d.getTime(); };
-  const hourLabel = (hr) => `${hr % 12 || 12} ${hr < 12 ? 'AM' : 'PM'}`;
-  const dayPlan = (key) => (planner[key] && typeof planner[key] === 'object' ? planner[key] : {});
-  function savePlanner() {
-    const oldest = dayKey(now() - PLAN_KEEP_DAYS * DAY_MS);
-    Object.keys(planner).forEach((k) => {
-      if (k < oldest || !Object.keys(dayPlan(k)).length) delete planner[k];
-    });
-    store.set('mp_planner', planner);
-  }
-
-  function renderPlanner() {
-    if (plannerListEl.contains(document.activeElement)) return;
-    const t = plannerDay();
-    const key = dayKey(t);
-    const plan = dayPlan(key);
-    const hourNow = new Date(now()).getHours();
-    const rel = plannerOffset === 0 ? 'Today' : plannerOffset === 1 ? 'Tomorrow' : plannerOffset === -1 ? 'Yesterday'
-      : plannerOffset > 0 ? `In ${plannerOffset} days` : `${-plannerOffset} days ago`;
-    $('planner-rel').textContent = rel;
-    $('planner-date').textContent = new Date(t).toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'short' });
-    $('planner-today').hidden = plannerOffset === 0;
-    $('planner-clear').hidden = !Object.keys(plan).length;
-    const rows = [];
-    for (let hr = PLAN_FROM; hr <= PLAN_TO; hr++) {
-      const isNow = plannerOffset === 0 && hr === hourNow;
-      const isPast = plannerOffset < 0 || (plannerOffset === 0 && hr < hourNow);
-      const text = typeof plan[hr] === 'string' ? plan[hr] : '';
-      const field = h('input', { type: 'text', id: `plan-${hr}`, maxlength: '140', 'data-hour': String(hr), enterkeyhint: 'next', placeholder: isNow ? 'Right now…' : '' });
-      field.value = text;
-      rows.push(h('li', { class: ['slot-row', isNow ? 'is-now' : '', isPast && !isNow ? 'is-past' : '', text ? 'is-filled' : ''].join(' ').trim() },
-        h('label', { for: `plan-${hr}` }, hourLabel(hr)), field));
-    }
-    plannerListEl.replaceChildren(...rows);
-  }
-  plannerListEl.addEventListener('input', (e) => {
-    const hr = e.target.dataset && e.target.dataset.hour;
-    if (!hr) return;
-    const key = dayKey(plannerDay());
-    const plan = Object.assign({}, dayPlan(key));
-    if (e.target.value.trim()) plan[hr] = e.target.value; else delete plan[hr];
-    planner[key] = plan;
-    savePlanner();
-    e.target.parentElement.classList.toggle('is-filled', !!e.target.value.trim());
-    $('planner-clear').hidden = !Object.keys(plan).length;
-  });
-  // Enter jumps to the next hour, like a paper planner.
-  plannerListEl.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' || !e.target.dataset.hour) return;
-    e.preventDefault();
-    const next = $(`plan-${Number(e.target.dataset.hour) + 1}`);
-    if (next) next.focus(); else e.target.blur();
-  });
-  const movePlanner = (to) => { plannerOffset = to; if (plannerListEl.contains(document.activeElement)) document.activeElement.blur(); renderPlanner(); };
-  $('planner-prev').addEventListener('click', () => movePlanner(plannerOffset - 1));
-  $('planner-next').addEventListener('click', () => movePlanner(plannerOffset + 1));
-  $('planner-today').addEventListener('click', () => movePlanner(0));
-  $('planner-clear').addEventListener('click', () => {
-    const key = dayKey(plannerDay());
-    const was = dayPlan(key);
-    if (!Object.keys(was).length) return;
-    delete planner[key];
-    savePlanner();
-    renderPlanner();
-    sfx.drop();
-    toast('Day cleared', {
-      action: 'Undo',
-      duration: 6000,
-      onAction: () => { planner[key] = was; savePlanner(); renderPlanner(); },
-    });
-  });
-  // Keep the "now" hour lit as the clock moves on.
-  setInterval(() => { if (currentTab === 'planner') renderPlanner(); }, 60 * 1000);
 
   // ── Raccoon mode: full-screen timers ───────────────────────────────────
   const RACCOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 8.5L4.5 3l4.5 2.8M18.5 8.5l1-5.5L15 5.8"/><path d="M3.5 11c0-3.6 3.8-6 8.5-6s8.5 2.4 8.5 6c0 4.4-3.8 9-8.5 9s-8.5-4.6-8.5-9z"/><path fill="currentColor" stroke="none" fill-rule="evenodd" d="M4 11.2c1.9-1.9 5.4-2.2 8-.6 2.6-1.6 6.1-1.3 8 .6-.4 2-2.3 3.2-4 3.2-1.6 0-2.7-1.1-4-1.1s-2.4 1.1-4 1.1c-1.7 0-3.6-1.2-4-3.2zM9.6 11.6a1.1 1.1 0 10-2.2 0 1.1 1.1 0 002.2 0zM16.6 11.6a1.1 1.1 0 10-2.2 0 1.1 1.1 0 002.2 0z"/><circle cx="12" cy="16.4" r="1.1" fill="currentColor" stroke="none"/></svg>';
@@ -4608,8 +4625,11 @@ body.is-shake .wrap { animation: shake .4s; }
   ];
   const COON_DONE_LINES = ['Clean getaway. Nice raid.', 'Haul secured.', 'Back to the den. Good work.'];
   const COON_MAX_MINS = 240;
+  const pad2 = (n) => String(n).padStart(2, '0');
   const coonEl = $('coon');
   const coonChip = $('coon-chip');
+  const coonBtn = $('coon-btn');
+  const coonDialog = $('coon-dialog');
   const coonInput = $('coon-custom-input');
   const baseTitle = document.title;
   function cleanCoon(c) {
@@ -4662,6 +4682,8 @@ body.is-shake .wrap { animation: shake .4s; }
     coonEl.classList.toggle('is-done', coonDone);
     coonEl.classList.toggle('is-paused', paused);
     coonChip.classList.toggle('is-done', coonDone);
+    coonBtn.classList.add('is-running');
+    coonBtn.classList.toggle('is-done', coonDone);
     coonChip.lastChild.textContent = coonDone ? "Time's up" : time;
     coonChip.setAttribute('aria-label', coonDone ? "Raccoon timer: time's up. Open it" : `Raccoon timer: ${time} left. Open it`);
     document.title = coonDone ? `Time's up! · ${baseTitle}` : `${paused ? '⏸ ' : ''}${time} · ${baseTitle}`;
@@ -4682,6 +4704,7 @@ body.is-shake .wrap { animation: shake .4s; }
   }
   function startCoon(mins) {
     stopAlarm();
+    if (coonDialog.open) coonDialog.close();
     const total = mins * 60 * 1000;
     coon = { mins, total, endsAt: Date.now() + total, left: null, shrunk: false, line: pick(COON_LINES), doneLine: pick(COON_DONE_LINES) };
     coonDone = false;
@@ -4715,27 +4738,36 @@ body.is-shake .wrap { animation: shake .4s; }
     saveCoon();
     setCoonOpen(false);
     coonChip.hidden = true;
+    coonBtn.classList.remove('is-running', 'is-done');
     document.title = baseTitle;
   }
 
   coonChip.append(iconEl(RACCOON), h('span'));
+  coonBtn.append(iconEl(RACCOON));
+  // The icon opens the timer picker; with a timer already running it brings that timer back instead.
+  coonBtn.addEventListener('click', () => {
+    if (coon) { coon.shrunk = false; saveCoon(); showCoon(); return; }
+    if (typeof coonDialog.showModal === 'function') coonDialog.showModal();
+    else coonDialog.setAttribute('open', '');
+  });
   $('coon-face').append(iconEl(RACCOON));
   document.querySelectorAll('.coon-tile').forEach((tile) => tile.prepend(iconEl(RACCOON)));
   document.querySelectorAll('.coon-tile[data-mins]').forEach((tile) => {
     tile.addEventListener('click', () => startCoon(Number(tile.dataset.mins)));
   });
-  $('coon-custom-form').addEventListener('submit', (e) => {
-    e.preventDefault();
+  const startCustom = () => {
     const mins = Math.round(Number(coonInput.value));
     if (!Number.isFinite(mins) || mins < 1 || mins > COON_MAX_MINS) {
-      toast(`Pick 1 to ${COON_MAX_MINS} minutes`);
       coonInput.focus();
+      coonInput.reportValidity(); // the picker is a modal, so a toast would hide behind it
       return;
     }
     coonInput.value = String(mins);
     store.set('mp_raccoon_custom', mins);
     startCoon(mins);
-  });
+  };
+  $('coon-go').addEventListener('click', startCustom);
+  coonInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); startCustom(); } });
   $('coon-pause').addEventListener('click', () => {
     if (!coon || coonDone) return;
     if (coon.left != null) { coon.endsAt = Date.now() + coon.left; coon.left = null; }
